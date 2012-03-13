@@ -53,7 +53,7 @@ static void mem_dump( STMEMCTRL *pCtrl ,
     default: printf( "dump error\n" ); return;
     }
 
-    for ( i=0 ; i<0xF ; i+=pCtrl->nIncSize )
+    for ( i=0 ; i<=0xF ; i+=pCtrl->nIncSize )
         printf( "%lx%s " , i , space );
 
     CLAR;
@@ -68,7 +68,7 @@ static void mem_dump( STMEMCTRL *pCtrl ,
         printf( "0x%08lx   " , l );
         CLAR;
 
-        for ( i=0 ; i<0xF ; i+=pCtrl->nIncSize ) {
+        for ( i=0 ; i<=0xF ; i+=pCtrl->nIncSize ) {
 
             if (( l + i ) >= ulAddr+ulLen )
                 break;
