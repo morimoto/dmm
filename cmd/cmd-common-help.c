@@ -16,7 +16,7 @@
 static STHELPMSG s_Help[] = {
     {"--help" , "print help (-h)"  , "dmm --help"},
     {"-h"     , "print help"       , "dmm -h"},
-    {"help"   , "print detail"     , "dmm help [cmd]"},
+    {"help"   , "print detail (dmm help md)"     , "dmm help [cmd]"},
     HELPMSGEND
 };
 
