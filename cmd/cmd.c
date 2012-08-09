@@ -368,6 +368,29 @@ static bool cmdhelp( int nArgc, char *pstrArgv[] , enum ESTYPE EStype , REGID id
 //               Usage
 //
 //=====================================
+bool DetailUsage( const char *pCmd )
+{
+    STHELPMSG *phelp;
+    int i;
+
+    for( i=0 ; i<GetCmdListSize( ); i++ ) {
+        if( !IsEnableCmd( i ) )
+            continue;
+
+        phelp = GetCmdList( i )->pHelp;
+        while ( phelp->pstrCmd ) {
+            if( CMD_HIT( phelp->pstrCmd , pCmd )) {
+                printf( "%s\n" , phelp->pstrDetail );
+                return true;
+            }
+            phelp++;
+        }
+    }
+
+    Usage( "help" );
+    return false;
+}
+
 bool Usage( const char *pMsg )
 {
     int        i     = 0;

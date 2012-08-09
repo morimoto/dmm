@@ -107,6 +107,7 @@ typedef struct cmdlist {
 #define IsCmdHit( ) _IsCmdHit( pstrArgv[0] , s_Help )
 bool _IsCmdHit( const char * , STHELPMSG * );
 bool Usage( const char* );
+bool DetailUsage( const char* );
 enum ESTYPE CmdGetDataSize( char* , enum ESTYPE );
 
 bool CmdCommon( int , char** , enum ESTYPE , REGID , REGID );
