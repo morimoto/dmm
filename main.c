@@ -42,7 +42,7 @@ int main( int   nArgc,
     //             check param
     //
     //=====================================
-    _sysCPUInit(  );
+    _sysCmdInit(  );
 
     if( 2 > nArgc )
         return Usage( "parameter is nedded" );
@@ -71,8 +71,6 @@ int main( int   nArgc,
         Usage( "parameter error" );
 
  cmdstart:
-    _sysArchCmdInit( cmd );
-
     if( !cmd->fnCmd( nArgc , pstrArgv ) )
         Error( "Cmd return error" );
 

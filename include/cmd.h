@@ -124,5 +124,10 @@ void EnableCmd( const char* );
 void SetCmdData( const char*, void* );
 void* GetCmdData( const char* );
 
+//----------------------
+// system function
+//----------------------
+void _sysCmdInit( void );
+
 #endif
 

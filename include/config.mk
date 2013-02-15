@@ -1,18 +1,17 @@
 CC            = $(CROSS_COMPILE)gcc
 AR            = $(CROSS_COMPILE)ar
 STRIP         = $(CROSS_COMPILE)strip
-INCLUDE       = -I$(TOP)/include -I$(TOP) -I$(CPUDIR)
+INCLUDE       = -I$(TOP)/include -I$(TOP)
 CFLAGS        = -Wall -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion $(EXTR)
 MAKEFILE      = Makefile $(TOP)/include/config.mk
 MAKEOPTION    = LFLAGS="$(LFLAGS)" CROSS_COMPILE="$(CROSS_COMPILE)" TOP="$(TOP)" INCLUDE="$(INCLUDE)"
 DEPENDTGT     = $(OBJS:.o=.c) $(DEPEND)
 ATARGET       = builtin.a
-LIBS          = $(addsuffix /builtin.a, $(SUBDIR)) $(addsuffix /builtin.a, $(CPUDIR))
-CPUDIR        = $(TOP)/cpu/none
+LIBS          = $(addsuffix /builtin.a, $(SUBDIR))
 
-.PHONY : $(SUBDIR) $(CPUDIR) autofile _clean
+.PHONY : $(SUBDIR) autofile _clean
 
-$(TARGET): depend $(CPUDIR) $(SUBDIR) $(LIBS) $(OBJS) $(MAKEFILE)
+$(TARGET): depend $(SUBDIR) $(LIBS) $(OBJS) $(MAKEFILE)
 	@echo "CC $@"
 	@$(CC) $(CFLAGS) $(INCLUDE) $(LFLAGS) -o $@ $(OBJS) $(LIBS)
 	@$(STRIP) $@
@@ -21,7 +20,7 @@ $(ATARGET): $(OBJS) $(AUTOFILES) $(MAKEFILE)
 	@echo "AR $@"
 	@$(AR) $(ARFLAGS) $@ $(OBJS)
 
-$(SUBDIR) $(CPUDIR):
+$(SUBDIR):
 	@echo "CD $@"
 	@make -s $(MAKEOPTION) -C $@ $(ATARGET)
 
@@ -50,10 +49,10 @@ _depend:
 
 depend: 
 	@rm -f depend.mk
-	@for dir in $(CPUDIR) $(SUBDIR) ; do \
+	@for dir in $(SUBDIR) ; do \
 		make -s $(MAKEOPTION) -C $$dir autofile; \
 	done
-	@for dir in $(CPUDIR) $(SUBDIR) ; do \
+	@for dir in $(SUBDIR) ; do \
 		make -s $(MAKEOPTION) -C $$dir _depend; \
 	done
 	@: > depend

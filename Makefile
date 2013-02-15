@@ -1,7 +1,6 @@
 TOP           = $(shell /bin/pwd)
 TARGET        = dmm
 SUBDIR        = cmd lib
-ALLCPUDIR     = none
 OBJS          = main.o
 
 -include $(TOP)/.config
@@ -16,7 +15,4 @@ clean:
 	@make -s $(MAKEOPTION) _clean
 	@for dir in $(SUBDIR); do \
 		make -s $(MAKEOPTION) -C $$dir _clean;\
-	done
-	@for dir in $(ALLCPUDIR); do \
-		make -s $(MAKEOPTION) -C cpu/$$dir _clean;\
 	done

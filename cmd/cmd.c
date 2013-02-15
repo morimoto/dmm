@@ -223,3 +223,19 @@ void* GetCmdData( const char* pstrName )
     }
     return NULL;
 }
+
+//=====================================
+//
+//          _sysCmdInit
+//
+//=====================================
+void _sysCmdInit( void )
+{
+    //----------------------
+    // default enable cmd
+    //----------------------
+    EnableCmd( "md" );
+    EnableCmd( "me" );
+    EnableCmd( "help" );
+    EnableCmd( "version" );
+}
