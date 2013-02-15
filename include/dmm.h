@@ -27,8 +27,6 @@
 //
 //
 //======================================================================
-#define VERSION "1.0.7"   // see VERSION file for detail
-
 #define PRODUCE_BY      "Produce by        : Kuninori Morimoto"
 #define SPECIAL_THANKS  "Special thanks to : Hideyuki Sano\n"
 

@@ -1,9 +1,9 @@
 CC            = $(CROSS_COMPILE)gcc
 AR            = $(CROSS_COMPILE)ar
 STRIP         = $(CROSS_COMPILE)strip
-CFLAGS        = -Wall -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion $(EXTR) -I$(TOP)/include -I$(TOP)
+CFLAGS        = -Wall -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion $(EXTR) -I$(TOP)/include -I$(TOP) -DVERSION="\"$(VERSION)\""
 MAKEFILE      = Makefile $(TOP)/include/config.mk
-MAKEOPTION    = LFLAGS="$(LFLAGS)" CROSS_COMPILE="$(CROSS_COMPILE)" TOP="$(TOP)"
+MAKEOPTION    = LFLAGS="$(LFLAGS)" CROSS_COMPILE="$(CROSS_COMPILE)" TOP="$(TOP)" VERSION="$(VERSION)"
 DEPENDTGT     = $(OBJS:.o=.c) $(DEPEND)
 ATARGET       = builtin.a
 LIBS          = $(addsuffix /builtin.a, $(SUBDIR))
