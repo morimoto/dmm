@@ -75,6 +75,5 @@ bool       _Error( const char * , const char * , int );
 #include "memctrl.h"
 #include "cmd.h"
 #include "cpu.h"
-#include "regctrl.h"
 
 #endif /* DMM_H */

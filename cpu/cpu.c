@@ -7,7 +7,6 @@ This file is loaded from cpu/${ARCH} file
 
 2008/11  morimoto
 ************************************************************************/
-#include "regctrl.h"
 #include "cmd/cmdlist.h"
 
 static const STCPU *s_pCpu = NULL;
@@ -80,8 +79,6 @@ const STCPU* GetCPU( void )
 static void archinit( void );
 void _sysCPUInit( void )
 {
-    _sysRegInit(  );
-
     //----------------------
     // default enable cmd
     //----------------------

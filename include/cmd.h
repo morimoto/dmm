@@ -110,8 +110,6 @@ bool Usage( const char* );
 bool DetailUsage( const char* );
 enum ESTYPE CmdGetDataSize( char* , enum ESTYPE );
 
-bool CmdCommon( int , char** , enum ESTYPE , REGID , REGID );
-
 int GetCmdListSize( void );
 const STCMD* GetCmdList( int );
 bool IsEnableCmd( int );
