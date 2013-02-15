@@ -1,10 +1,9 @@
 CC            = $(CROSS_COMPILE)gcc
 AR            = $(CROSS_COMPILE)ar
 STRIP         = $(CROSS_COMPILE)strip
-INCLUDE       = -I$(TOP)/include -I$(TOP)
-CFLAGS        = -Wall -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion $(EXTR)
+CFLAGS        = -Wall -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion $(EXTR) -I$(TOP)/include -I$(TOP)
 MAKEFILE      = Makefile $(TOP)/include/config.mk
-MAKEOPTION    = LFLAGS="$(LFLAGS)" CROSS_COMPILE="$(CROSS_COMPILE)" TOP="$(TOP)" INCLUDE="$(INCLUDE)"
+MAKEOPTION    = LFLAGS="$(LFLAGS)" CROSS_COMPILE="$(CROSS_COMPILE)" TOP="$(TOP)"
 DEPENDTGT     = $(OBJS:.o=.c) $(DEPEND)
 ATARGET       = builtin.a
 LIBS          = $(addsuffix /builtin.a, $(SUBDIR))
@@ -13,7 +12,7 @@ LIBS          = $(addsuffix /builtin.a, $(SUBDIR))
 
 $(TARGET): depend $(SUBDIR) $(LIBS) $(OBJS) $(MAKEFILE)
 	@echo "CC $@"
-	@$(CC) $(CFLAGS) $(INCLUDE) $(LFLAGS) -o $@ $(OBJS) $(LIBS)
+	@$(CC) $(CFLAGS) $(LFLAGS) -o $@ $(OBJS) $(LIBS)
 	@$(STRIP) $@
 
 $(ATARGET): $(OBJS) $(AUTOFILES) $(MAKEFILE)
@@ -26,7 +25,7 @@ $(SUBDIR):
 
 .c.o:
 	@echo "CC $@"
-	@$(CC) $(CFLAGS) $(INCLUDE) $(LFLAGS) -c $<
+	@$(CC) $(CFLAGS) $(LFLAGS) -c $<
 
 regs.h: regs
 	@rm -f $@
@@ -34,7 +33,7 @@ regs.h: regs
 
 regs: regs.def
 	@rm -f $@
-	@gcc $(INCLUDE) $(TOP)/cpu/regdef.c -o $@
+	@gcc $(TOP)/cpu/regdef.c -o $@
 
 autofile:
 ifneq ($(AUTOFILES),)
@@ -44,7 +43,7 @@ endif
 _depend:
 	@echo "create depend on `pwd`";
 	@for f in $(DEPENDTGT); do \
-		$(CC) -M $$f $(INCLUDE) >> depend.mk; \
+		$(CC) $(CFLAGS) -M $$f >> depend.mk; \
 	done
 
 depend: 
