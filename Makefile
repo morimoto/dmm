@@ -1,7 +1,7 @@
 TOP           = $(shell /bin/pwd)
 TARGET        = dmm
 SUBDIR        = cmd lib
-ALLCPUDIR     = sh none
+ALLCPUDIR     = none
 OBJS          = main.o
 
 -include $(TOP)/.config
@@ -11,10 +11,6 @@ include ./include/config.mk
 
 debug:
 	make LFLAGS="-D_DEBUG -g" 
-
-sh3 sh4:
-	@echo "create dmm for $@"
-	@make -s CPUDIR=$(TOP)/cpu/sh $(TARGET)
 
 clean:
 	@make -s $(MAKEOPTION) _clean
