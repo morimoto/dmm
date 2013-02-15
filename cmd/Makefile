@@ -1,4 +1,4 @@
-OBJS_COMMON = cmd-common-help.o cmd-common-md.o cmd-common-me.o cmd-common-version.o
+OBJS_COMMON = cmd-help.o cmd-md.o cmd-me.o cmd-version.o
 
 SRC_ALL     = $(OBJS_COMMON:.o=.c)
 
