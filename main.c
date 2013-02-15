@@ -59,6 +59,7 @@ int main( int   nArgc,
         cmd = GetCmdList( i ); 
 
         if ( CMD_HIT( pstrArgv[0], cmd->pstrName ) &&
+             pstrArgv[1] &&
              (CMD_HIT( pstrArgv[1], "--help" ) ||
               CMD_HIT( pstrArgv[1], "-h" )))
             return DetailUsage( cmd->pstrName );
