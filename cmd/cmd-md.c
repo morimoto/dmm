@@ -30,9 +30,40 @@ static STHELPMSG s_Help[] = {
 //          mem_dump
 //
 //=====================================
-static void mem_dump( STMEMCTRL *pCtrl ,
-                      u32 ulAddr ,
-                      u32 ulLen )
+static int mem_dump_single_column( STMEMCTRL *pCtrl ,
+                                   u32 ulAddr ,
+                                   u32 ulLen )
+{
+    u32 inc;
+    u32 l;
+
+    DMSG( "%s\n" , __FUNCTION__);
+
+    switch ( pCtrl->EStype ) {
+    case TBYTE : inc = 1; break;
+    case TWORD : inc = 2; break;
+    case TLONG : inc = 4; break;
+    case TERR:
+    default: printf( "unknown stype\n" ); return false;
+    }
+
+    for ( l=ulAddr ; l<ulAddr + ulLen ; l+=inc ) {
+
+        BLUE;
+        printf( "0x%08lx   " , l );
+        CLAR;
+
+        if( !pCtrl->fnDump( l ))
+            break;
+        printf( "\n" );
+    }
+
+    return true;
+}
+
+static int mem_dump_mult_column( STMEMCTRL *pCtrl ,
+                                  u32 ulAddr ,
+                                  u32 ulLen )
 {
     u32         i      = 0;
     u32         l      = 0;
@@ -50,7 +81,7 @@ static void mem_dump( STMEMCTRL *pCtrl ,
     case TWORD : space = "   ";     break;
     case TLONG : space = "       "; break;
     case TERR:
-    default: printf( "dump error\n" ); return;
+    default: printf( "dump error\n" ); return false;
     }
 
     for ( i=0 ; i<=0xF ; i+=pCtrl->nIncSize )
@@ -85,6 +116,8 @@ static void mem_dump( STMEMCTRL *pCtrl ,
         }
         printf( "\n" );
     }
+
+    return true;
 }
 
 //=====================================
@@ -116,17 +149,10 @@ static bool cmd( int nArgc, char *pstrArgv[] )
             goto error;
     }
 
-    if ( 2 == nArgc ) {
-        BLUE;
-        printf( "0x%08lx > " , addr );
-        CLAR;
-        pmctrl->fnDump( addr );
-        printf( "\n" );
-    }
-    else {
-        mem_dump( pmctrl , addr , GetData( pstrArgv[2] ));
-    }
-    ret = true;
+    if ( 2 == nArgc )
+        ret = mem_dump_single_column( pmctrl , addr , 1 );
+    else
+        ret = mem_dump_mult_column( pmctrl , addr , GetData( pstrArgv[2] ));
 
  error:
     MemExit(  );
