@@ -6,6 +6,7 @@
 2008/09  morimoto
 ************************************************************************/
 #include "dmm.h"
+#include <unistd.h>
 
 //=====================================
 //
@@ -15,7 +16,8 @@
 static STHELPMSG s_Help[] = {
     {
         "md" , "memory dump" ,
-        "dmm md[.d, .w, .l] addr [len]\n"
+        "dmm md[.d, .w, .l] [-c] addr [len]\n"
+        "    -c    : dump in 1 column\n"
         "    addr  : address\n"
         "    len   : length\n"
         " ex) dmm md.b 0x88000000\n"
@@ -127,10 +129,28 @@ static int mem_dump_mult_column( STMEMCTRL *pCtrl ,
 //=====================================
 static bool cmd( int nArgc, char *pstrArgv[] )
 {
-    u32           addr   = GetAddress( pstrArgv[1] );
+    u32           addr;
     enum ESTYPE   stype  = CmdGetDataSize( pstrArgv[0] , TLONG );
     STMEMCTRL*    pmctrl = NULL;
     bool          ret    = false;
+    u32           len;
+    int           res;
+    int           (*func)( STMEMCTRL *pCtrl , u32 ulAddr , u32 ulLen );
+
+    func = mem_dump_mult_column;
+
+    while(( res = getopt( nArgc, pstrArgv, "c" )) != -1 ) {
+        switch( res ) {
+        case 'c':
+            func = mem_dump_single_column;
+            break;
+        default:
+            return Usage("unknown option");
+        }
+    }
+
+    nArgc    -= optind;
+    pstrArgv += optind;
 
     if ( TERR == stype )
         return Usage( "type error" );
@@ -144,15 +164,20 @@ static bool cmd( int nArgc, char *pstrArgv[] )
         goto error;
     }
 
+    addr = GetAddress( pstrArgv[0] );
     if ( addr & ( pmctrl->nIncSize-1 )) {
             Error( "stype and addr error" );
             goto error;
     }
 
-    if ( 2 == nArgc )
-        ret = mem_dump_single_column( pmctrl , addr , 1 );
-    else
-        ret = mem_dump_mult_column( pmctrl , addr , GetData( pstrArgv[2] ));
+    if ( 1 == nArgc ) {
+        func = mem_dump_single_column;
+        len = 1;
+    } else {
+        len = GetData( pstrArgv[1] );
+    }
+
+    ret = func( pmctrl , addr , len );
 
  error:
     MemExit(  );
@@ -168,12 +193,10 @@ static bool cmd( int nArgc, char *pstrArgv[] )
 static bool
 ishit( int nArgc, char *pstrArgv[] )
 {
-    if ( (CMD_HIT( pstrArgv[0] , "md.b" ) ||
-          CMD_HIT( pstrArgv[0] , "md.w" ) ||
-          CMD_HIT( pstrArgv[0] , "md.l" ) ||
-          IsCmdHit( ))
-         &&
-         (( 2 == nArgc ) || ( 3 == nArgc )))
+    if (CMD_HIT( pstrArgv[0] , "md.b" ) ||
+        CMD_HIT( pstrArgv[0] , "md.w" ) ||
+        CMD_HIT( pstrArgv[0] , "md.l" ) ||
+        IsCmdHit( ))
         return true;
 
     return false;
