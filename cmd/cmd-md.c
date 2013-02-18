@@ -16,8 +16,9 @@
 static STHELPMSG s_Help[] = {
     {
         "md" , "memory dump" ,
-        "dmm md[.d, .w, .l] [-c] addr [len]\n"
+        "dmm md[.d, .w, .l] [-cs] addr [len]\n"
         "    -c    : dump in 1 column\n"
+        "    -s    : silence output\n"
         "    addr  : address\n"
         "    len   : length\n"
         " ex) dmm md.b 0x88000000\n"
@@ -33,6 +34,7 @@ static STHELPMSG s_Help[] = {
 //
 //=====================================
 static int mem_dump_single_column( STMEMCTRL *pCtrl ,
+                                   int silence,
                                    u32 ulAddr ,
                                    u32 ulLen )
 {
@@ -51,9 +53,11 @@ static int mem_dump_single_column( STMEMCTRL *pCtrl ,
 
     for ( l=ulAddr ; l<ulAddr + ulLen ; l+=inc ) {
 
-        BLUE;
-        printf( "0x%08lx   " , l );
-        CLAR;
+        if ( !silence ) {
+            BLUE;
+            printf( "0x%08lx   " , l );
+            CLAR;
+        }
 
         if( !pCtrl->fnDump( l ))
             break;
@@ -64,6 +68,7 @@ static int mem_dump_single_column( STMEMCTRL *pCtrl ,
 }
 
 static int mem_dump_mult_column( STMEMCTRL *pCtrl ,
+                                  int silence,
                                   u32 ulAddr ,
                                   u32 ulLen )
 {
@@ -73,11 +78,6 @@ static int mem_dump_mult_column( STMEMCTRL *pCtrl ,
 
     DMSG( "%s\n" , __FUNCTION__);
 
-    //----------------------
-    // draw offset line
-    //----------------------
-    BLUE;
-    printf("             ");
     switch ( pCtrl->EStype ) {
     case TBYTE : space = " " ;      break;
     case TWORD : space = "   ";     break;
@@ -86,20 +86,30 @@ static int mem_dump_mult_column( STMEMCTRL *pCtrl ,
     default: printf( "dump error\n" ); return false;
     }
 
-    for ( i=0 ; i<=0xF ; i+=pCtrl->nIncSize )
-        printf( "%lx%s " , i , space );
+    //----------------------
+    // draw offset line
+    //----------------------
+    if ( !silence ) {
+        BLUE;
+        printf("             ");
 
-    CLAR;
-    printf( "\n" );
+        for ( i=0 ; i<=0xF ; i+=pCtrl->nIncSize )
+            printf( "%lx%s " , i , space );
+
+        CLAR;
+        printf( "\n" );
+    }
 
     //----------------------
     // draw memory
     //----------------------
     for ( l=(ulAddr & 0xFFFFFFF0) ; l<ulAddr + ulLen ; l+=0x10 ) {
 
-        BLUE;
-        printf( "0x%08lx   " , l );
-        CLAR;
+        if ( !silence ) {
+            BLUE;
+            printf( "0x%08lx   " , l );
+            CLAR;
+        }
 
         for ( i=0 ; i<=0xF ; i+=pCtrl->nIncSize ) {
 
@@ -135,14 +145,18 @@ static bool cmd( int nArgc, char *pstrArgv[] )
     bool          ret    = false;
     u32           len;
     int           res;
-    int           (*func)( STMEMCTRL *pCtrl , u32 ulAddr , u32 ulLen );
+    int           silence = false;
+    int           (*func)( STMEMCTRL *pCtrl , int silence, u32 ulAddr , u32 ulLen );
 
     func = mem_dump_mult_column;
 
-    while(( res = getopt( nArgc, pstrArgv, "c" )) != -1 ) {
+    while(( res = getopt( nArgc, pstrArgv, "cs" )) != -1 ) {
         switch( res ) {
         case 'c':
             func = mem_dump_single_column;
+            break;
+        case 's':
+            silence = true;
             break;
         default:
             return Usage("unknown option");
@@ -177,7 +191,7 @@ static bool cmd( int nArgc, char *pstrArgv[] )
         len = GetData( pstrArgv[1] );
     }
 
-    ret = func( pmctrl , addr , len );
+    ret = func( pmctrl , silence, addr , len );
 
  error:
     MemExit(  );
