@@ -1,9 +1,12 @@
 /************************************************************************
 
-                  memory manage for develop
-
+ dmm
 	2008/09/03  Kuninori Morimoto   renovation start
 	2005/01/26  Sano hideyuki       develop start
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License version 2 as
+ published by the Free Software Foundation.
 
 ************************************************************************/
 //=====================================
