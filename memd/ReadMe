@@ -24,8 +24,13 @@
 * コンパイル方法
 ====================
 
-	Makefile 内の KPATH に Linux Kernel を書き、
+	sample.config を .config にコピーして、中に有る KPATH に Linux Kernel を書き、
 	コンパイルします
 
-	> vi Makefile
+	> cp sample.config .config
+	> vi .config
 	> make
+
+	その後、memd.ko をコピー
+
+	> cp memd.ko ${PATH}
