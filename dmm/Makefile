@@ -17,3 +17,6 @@ clean:
 	@for dir in $(SUBDIR); do \
 		make -s $(MAKEOPTION) -C $$dir _clean;\
 	done
+
+mrproper: clean
+	@rm -f .config
