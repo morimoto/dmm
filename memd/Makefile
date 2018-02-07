@@ -13,3 +13,6 @@ memd.ko : memd.c
 clean :
 	@make -s -C $(KPATH) -r M=$(TOP) clean
 	@-rm -rf modules.order
+
+mrproper: clean
+	@rm -f .config
