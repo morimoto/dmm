@@ -9,10 +9,6 @@
 
 MODULE_LICENSE("GPL");
 
-#if 0
-#define debug
-#endif
-
 #define PROCNAME "reg"
 #define NUM_CMD 7
 
@@ -67,9 +63,8 @@ static int cut_buff(char *buff, int *cmd, unsigned long *addr, unsigned long *va
 		str[i++] = *buff++;
 
 	str[i] = '\0';
-#ifdef debug
-	pr_info("  cmd : [%s] ", str);
-#endif
+
+	pr_debug("  cmd : [%s] ", str);
 
 	while (*buff == ' ')
 		buff++;
@@ -77,9 +72,7 @@ static int cut_buff(char *buff, int *cmd, unsigned long *addr, unsigned long *va
 	if (search_cmd(str, cmd))
 		return -EINVAL;
 
-#ifdef debug
-	pr_info("(%02X)\n", *cmd);
-#endif
+	pr_debug("(%02X)\n", *cmd);
 
 	/* get addr */
 	i = 0;
@@ -88,9 +81,7 @@ static int cut_buff(char *buff, int *cmd, unsigned long *addr, unsigned long *va
 
 	str[i] = '\0';
 
-#ifdef debug
-	pr_info("  addr : [%s] ", str);
-#endif
+	pr_debug("  addr : [%s] ", str);
 
 	ret = kstrtoul(str, 0, addr);
 	if (ret) {
@@ -101,9 +92,7 @@ static int cut_buff(char *buff, int *cmd, unsigned long *addr, unsigned long *va
 	while (*buff == ' ')
 		buff++;
 
-#ifdef debug
-	pr_info("(%lX)\n", *addr);
-#endif
+	pr_debug("(%lX)\n", *addr);
 
 	/* get Value */
 	if (*cmd == D_MEM_WRITE || *cmd == D_MEM_WRITE_W ||
@@ -114,17 +103,15 @@ static int cut_buff(char *buff, int *cmd, unsigned long *addr, unsigned long *va
 
 		str[i] = '\0';
 
-#ifdef debug
-		pr_info("val : %s(", str);
-#endif
+		pr_debug("val : %s(", str);
+
 		ret = kstrtoul(str, 0, val);
 		if (ret) {
 			pr_info("error(%d)  Invalid value [%s]\n", ret, str);
 			return -1;
 		}
-#ifdef debug
-		pr_info("%lX)\n", *val);
-#endif
+
+		pr_debug("%lX)\n", *val);
 	}
 
 	return 0;
@@ -235,9 +222,7 @@ ssize_t memd_proc_write(struct file *file, const char *buffer, size_t count, lof
 
 	buff[len - 1] = '\0';
 
-#ifdef debug
-	pr_info("Recv Command : [%s] (len = %ld)\n", buff, len);
-#endif
+	pr_debug("Recv Command : [%s] (len = %ld)\n", buff, len);
 
 	if (cut_buff(buff, &cmd, &addr, &val))
 		return -EINVAL;
