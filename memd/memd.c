@@ -135,62 +135,57 @@ int mem_read(unsigned long addr, int size)
 	long val;
 
 	reg = (char *)ioremap_nocache(addr, size);
-
-	if (reg != NULL) {
-
-		switch (size) {
-		case 1:
-			val = readb(reg);
-			pr_info("  mem read [%08lX] : %02lX\n", addr, val);
-			break;
-		case 2:
-			val = readw(reg);
-			pr_info("  mem read [%08lX] : %04lX\n", addr, val);
-			break;
-		case 4:
-			val = readl(reg);
-			pr_info("  mem read [%08lX] : %08lX\n", addr, val);
-			break;
-		}
-		iounmap(reg);
-	} else {
-		pr_info("  ioremap fail [%08lX]\n", addr);
+	if (!reg) {
+		pr_err("  ioremap fail [%08lX]\n", addr);
 		return -1;
 	}
 
+	switch (size) {
+	case 1:
+		val = readb(reg);
+		pr_info("  mem read [%08lX] : %02lX\n", addr, val);
+		break;
+	case 2:
+		val = readw(reg);
+		pr_info("  mem read [%08lX] : %04lX\n", addr, val);
+		break;
+	case 4:
+		val = readl(reg);
+		pr_info("  mem read [%08lX] : %08lX\n", addr, val);
+		break;
+	}
+
+	iounmap(reg);
+
 	return 0;
 }
-
-
 
 int mem_write(unsigned long addr, unsigned long val, int size)
 {
 	char *reg;
 
 	reg = ioremap_nocache(addr, size);
-
-	if (reg != NULL) {
-		switch (size) {
-		case 1:
-			writeb(val, reg);
-			pr_info("  mem write [%08lX] : %02lX\n", addr, val);
-			break;
-		case 2:
-			writew(val, reg);
-			pr_info("  mem write [%08lX] : %04lX\n", addr, val);
-			break;
-		case 4:
-			writel(val, reg);
-			pr_info("  mem write [%08lX] : %08lX\n", addr, val);
-			break;
-		}
-		iounmap(reg);
-	}
-
-	else {
-		pr_info("  ioremap fail [%08lX]\n", addr);
+	if (!reg) {
+		pr_err("  ioremap fail [%08lX]\n", addr);
 		return -1;
 	}
+
+	switch (size) {
+	case 1:
+		writeb(val, reg);
+		pr_info("  mem write [%08lX] : %02lX\n", addr, val);
+		break;
+	case 2:
+		writew(val, reg);
+		pr_info("  mem write [%08lX] : %04lX\n", addr, val);
+		break;
+	case 4:
+		writel(val, reg);
+		pr_info("  mem write [%08lX] : %08lX\n", addr, val);
+		break;
+	}
+
+	iounmap(reg);
 
 	return 0;
 }
@@ -203,17 +198,17 @@ int mem_dump(unsigned long addr, int size)
 	int i;
 
 	reg = (char *)ioremap_nocache(addr, size);
-
-	if (reg != NULL) {
-		for (i = 0; i < size/4; i += 4 ) {
-			val = readl(reg + i);
-			pr_info("  mem read [%08lX] : %08lX\n", addr + i, val);
-		}
-		iounmap(reg);
-	} else {
-		pr_info("  ioremap fail [%08lX]\n", addr);
-		return -1;
+	if (!reg) {
+		pr_err("  ioremap fail [%08lX]\n", addr);
+		return -ENOMEM;
 	}
+
+	for (i = 0; i < size/4; i += 4 ) {
+		val = readl(reg + i);
+		pr_info("  mem read [%08lX] : %08lX\n", addr + i, val);
+	}
+
+	iounmap(reg);
 
 	return 0;
 }
@@ -260,7 +255,7 @@ ssize_t memd_proc_write(struct file *file, const char *buffer, size_t count, lof
 		ret = mem_dump(addr, 0x80);
 		break;
 	default:
-		pr_info("  Fatal error\n");
+		pr_err("  Fatal error\n");
 		ret = -1;
 	}
 
