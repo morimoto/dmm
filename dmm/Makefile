@@ -2,7 +2,7 @@ TOP           = $(shell /bin/pwd)
 TARGET        = dmm
 SUBDIR        = cmd lib
 OBJS          = main.o
-VERSION       = "1.1.0"
+VERSION       = "1.1.1"
 
 -include $(TOP)/.config
 
