@@ -35,7 +35,7 @@ static STHELPMSG s_Help[] = {
 static bool cmd( int nArgc, char *pstrArgv[] )
 {
 
-    u32           addr;
+    uintptr_t     addr;
     enum ESTYPE   stype;
     u32           data;
     u32           data_check  = 0xFFFFFFFF;

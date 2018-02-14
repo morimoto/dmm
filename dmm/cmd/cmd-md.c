@@ -35,11 +35,11 @@ static STHELPMSG s_Help[] = {
 //=====================================
 static int mem_dump_single_column( STMEMCTRL *pCtrl ,
                                    int silence,
-                                   u32 ulAddr ,
+                                   uintptr_t ulAddr ,
                                    u32 ulLen )
 {
     u32 inc;
-    u32 l;
+    uintptr_t l;
 
     DMSG( "%s\n" , __FUNCTION__);
 
@@ -55,7 +55,7 @@ static int mem_dump_single_column( STMEMCTRL *pCtrl ,
 
         if ( !silence ) {
             BLUE;
-            printf( "0x%08lx   " , l );
+            printf( "%p   " , (void *)l );
             CLAR;
         }
 
@@ -69,11 +69,11 @@ static int mem_dump_single_column( STMEMCTRL *pCtrl ,
 
 static int mem_dump_mult_column( STMEMCTRL *pCtrl ,
                                   int silence,
-                                  u32 ulAddr ,
+				 uintptr_t ulAddr ,
                                   u32 ulLen )
 {
     u32         i      = 0;
-    u32         l      = 0;
+    uintptr_t   l      = 0;
     const char* space  = NULL;
 
     DMSG( "%s\n" , __FUNCTION__);
@@ -94,7 +94,7 @@ static int mem_dump_mult_column( STMEMCTRL *pCtrl ,
         printf("             ");
 
         for ( i=0 ; i<=0xF ; i+=pCtrl->nIncSize )
-            printf( "%lx%s " , i , space );
+            printf( "%x%s " , i , space );
 
         CLAR;
         printf( "\n" );
@@ -103,11 +103,11 @@ static int mem_dump_mult_column( STMEMCTRL *pCtrl ,
     //----------------------
     // draw memory
     //----------------------
-    for ( l=(ulAddr & 0xFFFFFFF0) ; l<ulAddr + ulLen ; l+=0x10 ) {
+    for ( l=(ulAddr & ~(uintptr_t)0xF) ; l<ulAddr + ulLen ; l+=0x10 ) {
 
         if ( !silence ) {
             BLUE;
-            printf( "0x%08lx   " , l );
+            printf( "%p   " , (void *)l );
             CLAR;
         }
 
@@ -139,14 +139,14 @@ static int mem_dump_mult_column( STMEMCTRL *pCtrl ,
 //=====================================
 static bool cmd( int nArgc, char *pstrArgv[] )
 {
-    u32           addr;
+    uintptr_t     addr;
     enum ESTYPE   stype  = CmdGetDataSize( pstrArgv[0] , TLONG );
     STMEMCTRL*    pmctrl = NULL;
     bool          ret    = false;
     u32           len;
     int           res;
     int           silence = false;
-    int           (*func)( STMEMCTRL *pCtrl , int silence, u32 ulAddr , u32 ulLen );
+    int           (*func)( STMEMCTRL *pCtrl , int silence, uintptr_t ulAddr , u32 ulLen );
 
     func = mem_dump_mult_column;
 

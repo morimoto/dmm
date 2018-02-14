@@ -58,7 +58,7 @@ static bool addrmapinit( void )
 //          IsInsideMap
 //
 //=====================================
-static bool isinsidemap( const u32 rAddr , STADDRMAP *pMap , STMEMCTRL *pCtrl )
+static bool isinsidemap( const uintptr_t rAddr , STADDRMAP *pMap , STMEMCTRL *pCtrl )
 {
     if ( !pMap || !pCtrl )
         return Error( "pMap or pCtrl is NULL" );
@@ -78,11 +78,11 @@ static bool isinsidemap( const u32 rAddr , STADDRMAP *pMap , STMEMCTRL *pCtrl )
 //          getaddrmap
 //
 //=====================================
-static STADDRMAP* getaddrmap( u32 rAddr , STMEMCTRL *pCtrl )
+static STADDRMAP* getaddrmap( uintptr_t rAddr , STMEMCTRL *pCtrl )
 {
     int  i         = 0;
     u32  page_size = 0;
-    u32  tgt_addr  = 0;
+    uintptr_t  tgt_addr  = 0;
     STADDRMAP  *pmap = NULL;
 
     //----------------------
@@ -110,11 +110,11 @@ static STADDRMAP* getaddrmap( u32 rAddr , STMEMCTRL *pCtrl )
     pmap      = s_tblAddrMap + s_nLastAddrMap;
 
     DMSG( "create new mmap\n" );
-    DMSG( "addr      : 0x%08lx\n" , rAddr );
-    DMSG( "page_size : 0x%08lx\n" , page_size );
-    DMSG( "tgt_addr  : 0x%08lx\n" , tgt_addr );
+    DMSG( "addr      : %p\n" , (void *)rAddr );
+    DMSG( "tgt_addr  : %p\n" , (void *)tgt_addr );
+    DMSG( "page_size : 0x%08x\n" , page_size );
 
-    pmap->rMap = (u32)mmap( NULL , page_size,
+    pmap->rMap = (uintptr_t)mmap( NULL , page_size,
                         PROT_WRITE | PROT_READ,
                         MAP_SHARED,
                         s_nFd,
@@ -138,7 +138,7 @@ static STADDRMAP* getaddrmap( u32 rAddr , STMEMCTRL *pCtrl )
 //          tgt2map
 //
 //=====================================
-static u32 tgt2map( STADDRMAP *pMap , const u32 rAddr )
+static uintptr_t tgt2map( STADDRMAP *pMap , const uintptr_t rAddr )
 {
     return ( rAddr - pMap->rTgt ) + pMap->rMap;
 }
@@ -148,7 +148,7 @@ static u32 tgt2map( STADDRMAP *pMap , const u32 rAddr )
 //          bread
 //
 //=====================================
-static bool bread( const u32 rAddr , u32 *pRet )
+static bool bread( const uintptr_t rAddr , u32 *pRet )
 {
     u8*        paddr = NULL;
     STADDRMAP* pmap  = getaddrmap( rAddr , &s_Bmem );
@@ -167,7 +167,7 @@ static bool bread( const u32 rAddr , u32 *pRet )
 //          wread
 //
 //=====================================
-static bool wread( const u32 rAddr , u32 *pRet )
+static bool wread( const uintptr_t rAddr , u32 *pRet )
 {
     u16*       paddr = NULL;
     STADDRMAP* pmap  = getaddrmap( rAddr , &s_Wmem );
@@ -186,7 +186,7 @@ static bool wread( const u32 rAddr , u32 *pRet )
 //          lread
 //
 //=====================================
-static bool lread( const u32 rAddr , u32 *pRet )
+static bool lread( const uintptr_t rAddr , u32 *pRet )
 {
     u32*        paddr = NULL;
     STADDRMAP*  pmap  = getaddrmap( rAddr , &s_Lmem );
@@ -205,7 +205,7 @@ static bool lread( const u32 rAddr , u32 *pRet )
 //          bdump
 //
 //=====================================
-static bool bdump( const u32 rAddr )
+static bool bdump( const uintptr_t rAddr )
 {
     u32 val;
 
@@ -221,7 +221,7 @@ static bool bdump( const u32 rAddr )
 //          wdump
 //
 //=====================================
-static bool wdump( const u32 rAddr )
+static bool wdump( const uintptr_t rAddr )
 {
     u32 val;
 
@@ -237,14 +237,14 @@ static bool wdump( const u32 rAddr )
 //          ldump
 //
 //=====================================
-static bool ldump( const u32 rAddr )
+static bool ldump( const uintptr_t rAddr )
 {
     u32 val;
 
     if ( !lread( rAddr , &val))
         return false;
 
-    printf( "%08lx" , val );
+    printf( "%08x" , val );
     return true;
 }
 
@@ -253,7 +253,7 @@ static bool ldump( const u32 rAddr )
 //          bedit
 //
 //=====================================
-static bool bedit( const u32 rAddr , void *pData )
+static bool bedit( const uintptr_t rAddr , void *pData )
 {
     STADDRMAP* pmap = getaddrmap( rAddr , &s_Bmem );
 
@@ -274,7 +274,7 @@ static bool bedit( const u32 rAddr , void *pData )
 //          wedit
 //
 //=====================================
-static bool wedit( const u32 rAddr , void *pData )
+static bool wedit( const uintptr_t rAddr , void *pData )
 {
     STADDRMAP* pmap  = getaddrmap( rAddr , &s_Wmem );
 
@@ -295,7 +295,7 @@ static bool wedit( const u32 rAddr , void *pData )
 //          ledit
 //
 //=====================================
-static bool ledit( const u32 rAddr , void *pData )
+static bool ledit( const uintptr_t rAddr , void *pData )
 {
     STADDRMAP* pmap = getaddrmap( rAddr , &s_Lmem );
 

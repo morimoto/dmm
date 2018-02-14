@@ -17,6 +17,7 @@
 //======================================================================
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 #include <errno.h>
 #include <stdbool.h>
 
@@ -41,7 +42,7 @@
 //          type
 //
 //=====================================
-typedef unsigned long  u32;
+typedef unsigned int   u32;
 typedef unsigned short u16;
 typedef unsigned char  u8;
 
@@ -65,7 +66,7 @@ typedef int REGID;
 //
 //
 //======================================================================
-u32 GetAddress( const char* );
+uintptr_t GetAddress( const char* );
 enum ESTYPE GetStype( const char* );
 u32  GetData( const char * );
 bool       _Error( const char * , const char * , int );

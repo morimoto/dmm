@@ -11,9 +11,9 @@
 //              GetAddress
 //
 //=====================================
-u32 GetAddress( const char *pstrArgv )
+uintptr_t GetAddress( const char *pstrArgv )
 {
-    u32 addr = 0;
+    unsigned long addr = 0;
 
     sscanf( pstrArgv , "%lx" , &addr );
     DMSG( "addr = 0x%08lx\n" , addr );

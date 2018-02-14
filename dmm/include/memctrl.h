@@ -29,8 +29,8 @@ enum ESTYPE {
 //=====================================
 typedef struct _addrmap {
     u32   nSize;
-    u32   rMap;
-    u32   rTgt;
+  uintptr_t   rMap;
+  uintptr_t   rTgt;
 } STADDRMAP;
 
 //=====================================
@@ -39,14 +39,13 @@ typedef struct _addrmap {
 //
 //=====================================
 typedef struct _memctrl {
-    bool   (*fnEdit)( u32, void* );
-    bool   (*fnRead)( u32, u32* );
-    bool   (*fnDump)( u32 );
+  bool   (*fnEdit)( uintptr_t, void* );
+  bool   (*fnRead)( uintptr_t, u32* );
+  bool   (*fnDump)( uintptr_t );
     u32   nIncSize;
     enum ESTYPE   EStype;
 } STMEMCTRL;
 
-STADDRMAP* GetAddrMap( u32 , STMEMCTRL* );
 STMEMCTRL* GetMemCtrl( enum ESTYPE );
 
 bool       MemInit( void );
