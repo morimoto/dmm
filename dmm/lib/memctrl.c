@@ -110,7 +110,7 @@ static STADDRMAP* getaddrmap( u32 rAddr , STMEMCTRL *pCtrl )
     pmap      = s_tblAddrMap + s_nLastAddrMap;
 
     DMSG( "create new mmap\n" );
-    DMSG( "addr      : 0x%08lx\n" , addr );
+    DMSG( "addr      : 0x%08lx\n" , rAddr );
     DMSG( "page_size : 0x%08lx\n" , page_size );
     DMSG( "tgt_addr  : 0x%08lx\n" , tgt_addr );
 
