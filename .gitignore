@@ -1,0 +1,16 @@
+GPATH
+GRTAGS
+GSYMS
+GTAGS
+*.o
+*.cmd
+*.ko
+*.mod*
+depend*
+builtin.a
+.config
+dmm/cmd/cmdlist.c
+dmm/cmd/cmdlist.h
+dmm/dmm
+memd/Module.symvers
+memd/modules.order
