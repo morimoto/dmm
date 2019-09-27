@@ -54,7 +54,7 @@ typedef int REGID;
 //
 //=====================================
 #define BLUE  printf( "\x1b[34m" );
-#define CLAR  printf( "\x1b[30m" );
+#define CLAR  printf( "\x1b[0m" );
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 #define Error( msg ) _Error( msg , __FUNCTION__ , __LINE__ )
