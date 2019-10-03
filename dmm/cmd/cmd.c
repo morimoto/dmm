@@ -40,7 +40,7 @@ bool DetailUsage( const char *pCmd )
     }
 
     Usage( "help" );
-    return false;
+    return true;
 }
 
 bool Usage( const char *pMsg )
