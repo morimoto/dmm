@@ -1,7 +1,7 @@
 /************************************************************************
 
 
-                                version
+			version
 
 2008/09  morimoto
 ************************************************************************/
@@ -10,39 +10,39 @@
 //======================================================================
 //
 //
-//                               help
+//			help
 //
 //
 //======================================================================
 static STHELPMSG s_Help[] = {
-    {"--version" , "print version (-v)" , "dmm --version"},
-    {"-v"        , "print version"      , "dmm -v"},
-    HELPMSGEND
+	{"--version",	"print version (-v)",	"dmm --version"},
+	{"-v",		"print version",	"dmm -v"},
+	HELPMSGEND
 };
 
 //=====================================
 //
-//               cmd
+//	cmd
 //
 //=====================================
-static bool cmd( int nArgc, char *pstrArgv[] )
+static bool cmd(int nArgc, char *pstrArgv[])
 {
-    printf( "version %s\n" , VERSION );
-    return true;
+	printf("version %s\n", VERSION);
+	return true;
 }
 
 //=====================================
 //
-//          ishit
+//	ishit
 //
 //=====================================
 static bool
-ishit( int nArgc, char *pstrArgv[] )
+ishit(int nArgc, char *pstrArgv[])
 {
-    if ( IsCmdHit( ) &&
-         ( 1 == nArgc ))
-        return true;
+	if (IsCmdHit() &&
+	     (nArgc == 1))
+		return true;
 
-    return false;
+	return false;
 }
-INSTALL_CMD( version )
+INSTALL_CMD(version)
