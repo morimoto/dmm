@@ -179,6 +179,10 @@ static bool cmd( int nArgc, char *pstrArgv[] )
     }
 
     addr = GetAddress( pstrArgv[0] );
+    if ( !addr ) {
+            Error( "addr error" );
+            goto error;
+    }
     if ( addr & ( pmctrl->nIncSize-1 )) {
             Error( "stype and addr error" );
             goto error;

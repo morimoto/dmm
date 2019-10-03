@@ -73,6 +73,10 @@ static bool cmd( int nArgc, char *pstrArgv[] )
         goto error;
     }
 
+    if ( !addr ) {
+        Error( "addr error" );
+        goto error;
+    }
     if ( addr & (pmctrl->nIncSize-1) ) {
         Error( "address alignment error" );
         goto error;
