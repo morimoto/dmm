@@ -45,8 +45,6 @@ int main( int   nArgc,
     //             check param
     //
     //=====================================
-    _sysCmdInit(  );
-
     if( 2 > nArgc )
         return Usage( "parameter is nedded" );
 
@@ -56,10 +54,7 @@ int main( int   nArgc,
 
     for ( i=0 ; i<GetCmdListSize( ) ; i++ ) {
 
-        if ( !IsEnableCmd( i ) )
-            continue;
-
-        cmd = GetCmdList( i ); 
+        cmd = GetCmdList( i );
 
         if ( CMD_HIT( pstrArgv[0], cmd->pstrName ) &&
              pstrArgv[1] &&

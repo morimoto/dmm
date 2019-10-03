@@ -55,7 +55,6 @@ typedef struct cmd {
 //=====================================
 typedef struct cmdlist {
     const STCMD *pCmd;
-    bool     isEnable;
     void    *pPrivateData;
 } STCMDLIST;
 
@@ -91,7 +90,6 @@ typedef struct cmdlist {
 #define CMD_EXTERN( name ) extern STCMD cmd_##name;
 #define CMD_DEFINE( name ) { \
     .pCmd = &cmd_##name,     \
-    .isEnable = false,       \
     .pPrivateData = NULL,    \
 },
 
@@ -112,22 +110,14 @@ enum ESTYPE CmdGetDataSize( char* , enum ESTYPE );
 
 int GetCmdListSize( void );
 const STCMD* GetCmdList( int );
-bool IsEnableCmd( int );
-bool IsEnableCmd( int );
 
 //=====================================
 //
 //          for cpu
 //
 //=====================================
-void EnableCmd( const char* );
 void SetCmdData( const char*, void* );
 void* GetCmdData( const char* );
-
-//----------------------
-// system function
-//----------------------
-void _sysCmdInit( void );
 
 #endif
 

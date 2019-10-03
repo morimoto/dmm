@@ -28,8 +28,6 @@ bool DetailUsage( const char *pCmd )
     int i;
 
     for( i=0 ; i<GetCmdListSize( ); i++ ) {
-        if( !IsEnableCmd( i ) )
-            continue;
 
         phelp = GetCmdList( i )->pHelp;
         while ( phelp->pstrCmd ) {
@@ -54,8 +52,6 @@ bool Usage( const char *pMsg )
 
     // print --XXX option
     for ( i=0 ; i<s_nCmdListSize ; i++ ){
-        if( !s_tblCmdList[i].isEnable )
-            continue;
 
         phelp = s_tblCmdList[i].pCmd->pHelp;
         while ( phelp->pstrCmd ) {
@@ -70,8 +66,6 @@ bool Usage( const char *pMsg )
 
     // print other help
     for ( i=0 ; i<s_nCmdListSize ; i++ ){
-        if( !s_tblCmdList[i].isEnable )
-            continue;
 
         phelp = s_tblCmdList[i].pCmd->pHelp;
         while ( phelp->pstrCmd ) {
@@ -156,39 +150,6 @@ const STCMD* GetCmdList( int ixCmd )
 
 //=====================================
 //
-//          EnableCmd
-//
-//=====================================
-void EnableCmd( const char* pstrName )
-{
-    int i;
-
-    for ( i=0 ; i<s_nCmdListSize ; i++ ) {
-        if ( 0 == strcmp( pstrName,
-                          s_tblCmdList[i].pCmd->pstrName )) {
-            s_tblCmdList[i].isEnable = true;
-            break;
-        }
-    }
-}
-
-//=====================================
-//
-//          IsEnableCmd
-//
-//=====================================
-bool IsEnableCmd( int ixCmd )
-{
-    if ( 0 > ixCmd ||
-         s_nCmdListSize <= ixCmd ) {
-        return false;
-    }
-
-    return s_tblCmdList[ixCmd].isEnable;
-}
-
-//=====================================
-//
 //          SetCmdData
 //
 //=====================================
@@ -222,20 +183,4 @@ void* GetCmdData( const char* pstrName )
         }
     }
     return NULL;
-}
-
-//=====================================
-//
-//          _sysCmdInit
-//
-//=====================================
-void _sysCmdInit( void )
-{
-    //----------------------
-    // default enable cmd
-    //----------------------
-    EnableCmd( "md" );
-    EnableCmd( "me" );
-    EnableCmd( "help" );
-    EnableCmd( "version" );
 }
