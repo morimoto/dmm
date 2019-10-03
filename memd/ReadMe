@@ -18,7 +18,7 @@
 
 	例）アドレス 0xec700060 に 0x00010000 を書き込み
 
-		# echo wd 0xec700060 0x00010000 > /proc/reg
+		> echo wd 0xec700060 0x00010000 > /proc/reg
 
 ====================
 * コンパイル方法
@@ -27,10 +27,10 @@
 	sample.config を .config にコピーして、中に有る KPATH に Linux Kernel を書き、
 	コンパイルします
 
-	> cp sample.config .config
-	> vi .config
-	> make
+		> cp sample.config .config
+		> vi .config
+		> make
 
 	その後、memd.ko をコピー
 
-	> cp memd.ko ${PATH}
+		> cp memd.ko ${PATH}
