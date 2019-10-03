@@ -1,7 +1,7 @@
 /************************************************************************
 
 
-                                  cmd
+			cmd
 
 2008/09  morimoto
 ************************************************************************/
@@ -11,7 +11,7 @@
 //======================================================================
 //
 //
-//                      global function
+//			global function
 //
 //
 //======================================================================
@@ -19,168 +19,162 @@
 
 //=====================================
 //
-//               Usage
+//	Usage
 //
 //=====================================
-bool DetailUsage( const char *pCmd )
+bool DetailUsage(const char *pCmd)
 {
-    STHELPMSG *phelp;
-    int i;
+	STHELPMSG *phelp;
+	int i;
 
-    for( i=0 ; i<GetCmdListSize( ); i++ ) {
+	for (i = 0; i < GetCmdListSize(); i++) {
 
-        phelp = GetCmdList( i )->pHelp;
-        while ( phelp->pstrCmd ) {
-            if( CMD_HIT( phelp->pstrCmd , pCmd )) {
-                printf( "%s\n" , phelp->pstrDetail );
-                return true;
-            }
-            phelp++;
-        }
-    }
+		phelp = GetCmdList(i)->pHelp;
+		while (phelp->pstrCmd) {
+			if (CMD_HIT(phelp->pstrCmd, pCmd)) {
+				printf("%s\n", phelp->pstrDetail);
+				return true;
+			}
+			phelp++;
+		}
+	}
 
-    Usage( "help" );
-    return true;
+	Usage("help");
+	return true;
 }
 
-bool Usage( const char *pMsg )
+bool Usage(const char *pMsg)
 {
-    int        i     = 0;
-    STHELPMSG *phelp = NULL;
+	int i = 0;
+	STHELPMSG *phelp = NULL;
 
-    printf( "[ %s ]\n" , pMsg );
+	printf("[ %s ]\n", pMsg);
 
-    // print --XXX option
-    for ( i=0 ; i<s_nCmdListSize ; i++ ){
+	// print --XXX option
+	for (i = 0; i < s_nCmdListSize; i++) {
 
-        phelp = s_tblCmdList[i].pCmd->pHelp;
-        while ( phelp->pstrCmd ) {
-            if (( 2   < strlen( phelp->pstrCmd )) &&
-                ('-' == phelp->pstrCmd[0]      )  &&
-                ('-' == phelp->pstrCmd[1]      ))
-                printf( "%-15s : %s\n" , phelp->pstrCmd , phelp->pstrUsage );
+		phelp = s_tblCmdList[i].pCmd->pHelp;
+		while (phelp->pstrCmd) {
+			if ((strlen(phelp->pstrCmd) > 2) &&
+			    ('-' == phelp->pstrCmd[0])   &&
+			    ('-' == phelp->pstrCmd[1]))
+				printf("%-15s : %s\n",
+				       phelp->pstrCmd, phelp->pstrUsage);
 
-            phelp++;
-        }
-    }
+			phelp++;
+		}
+	}
 
-    // print other help
-    for ( i=0 ; i<s_nCmdListSize ; i++ ){
+	// print other help
+	for (i = 0; i < s_nCmdListSize; i++) {
 
-        phelp = s_tblCmdList[i].pCmd->pHelp;
-        while ( phelp->pstrCmd ) {
-            if ('-' != phelp->pstrCmd[0] )
-                printf( "%-15s : %s\n" , phelp->pstrCmd , phelp->pstrUsage );
+		phelp = s_tblCmdList[i].pCmd->pHelp;
+		while (phelp->pstrCmd) {
+			if ('-' != phelp->pstrCmd[0])
+				printf("%-15s : %s\n",
+				       phelp->pstrCmd, phelp->pstrUsage);
 
-            phelp++;
-        }
-    }
+			phelp++;
+		}
+	}
 
-    printf( "\n"
-            PRODUCE_BY "\n"
-            SPECIAL_THANKS "\n"
-            );
+	printf("\n" PRODUCE_BY "\n" SPECIAL_THANKS "\n");
 
-    return true;
+	return true;
 }
 
 //=====================================
 //
-//          IsCmdHit
+//	IsCmdHit
 //
 //=====================================
-bool _IsCmdHit( const char *pstrCmd , STHELPMSG *pHelp )
+bool _IsCmdHit(const char *pstrCmd, STHELPMSG *pHelp)
 {
-    while ( pHelp->pstrCmd ) {
-        if ( CMD_HIT( pHelp->pstrCmd , pstrCmd ))
-            return true;
-        pHelp++;
-    }
-    return false;
+	while (pHelp->pstrCmd) {
+		if (CMD_HIT(pHelp->pstrCmd, pstrCmd))
+			return true;
+		pHelp++;
+	}
+	return false;
 }
 
-
 //=====================================
 //
-//          CmdGetDataSize
+//	CmdGetDataSize
 //
 // copy from uboot
 //=====================================
-enum ESTYPE CmdGetDataSize( char* pstrArg, enum ESTYPE EDefaultType )
+enum ESTYPE CmdGetDataSize(char *pstrArg, enum ESTYPE EDefaultType)
 {
-    // Check for a size specification .b, .w or .l.
-    size_t len = strlen( pstrArg );
+	// Check for a size specification .b, .w or .l.
+	size_t len = strlen(pstrArg);
 
-    if ( len > 2 && pstrArg[ len-2 ] == '.' ) {
-        switch( pstrArg[ len-1 ] ) {
-        case 'b': return TBYTE;
-        case 'w': return TWORD;
-        case 'l': return TLONG;
-        default:  return TERR;
-        }
-    }
-    return EDefaultType;
+	if (len > 2 && pstrArg[len - 2] == '.') {
+		switch (pstrArg[len - 1]) {
+		case 'b': return TBYTE;
+		case 'w': return TWORD;
+		case 'l': return TLONG;
+		default:  return TERR;
+		}
+	}
+	return EDefaultType;
 }
 
 //=====================================
 //
-//          GetCmdListSize
+//	GetCmdListSize
 //
 //=====================================
-int GetCmdListSize( void )
+int GetCmdListSize(void)
 {
-    return s_nCmdListSize;
+	return s_nCmdListSize;
 }
 
 //=====================================
 //
-//          GetCmdList
+//	GetCmdList
 //
 //=====================================
-const STCMD* GetCmdList( int ixCmd )
+const STCMD *GetCmdList(int ixCmd)
 {
-    if ( 0 > ixCmd ||
-         s_nCmdListSize <= ixCmd ) {
-        Error( "Cmd List index error" );
-        return NULL;
-    }
+	if (ixCmd < 0 ||
+	    s_nCmdListSize <= ixCmd) {
+		Error("Cmd List index error");
+		return NULL;
+	}
 
-    return s_tblCmdList[ixCmd].pCmd;
+	return s_tblCmdList[ixCmd].pCmd;
 }
 
 //=====================================
 //
-//          SetCmdData
+//	SetCmdData
 //
 //=====================================
-void SetCmdData( const char* pstrName,
-                 void* pData )
+void SetCmdData(const char *pstrName, void *pData)
 {
-    int i;
+	int i;
 
-    for ( i=0 ; i<s_nCmdListSize ; i++ ) {
-        if ( 0 == strcmp( pstrName,
-                          s_tblCmdList[i].pCmd->pstrName )) {
-            s_tblCmdList[i].pPrivateData = pData;
-            break;
-        }
-    }
+	for (i = 0; i < s_nCmdListSize; i++) {
+		if (strcmp(pstrName, s_tblCmdList[i].pCmd->pstrName) == 0) {
+			s_tblCmdList[i].pPrivateData = pData;
+			break;
+		}
+	}
 }
 
 //=====================================
 //
-//          GetCmdData
+//	GetCmdData
 //
 //=====================================
-void* GetCmdData( const char* pstrName )
+void *GetCmdData(const char *pstrName)
 {
-    int i;
+	int i;
 
-    for ( i=0 ; i<s_nCmdListSize ; i++ ) {
-        if ( 0 == strcmp( pstrName,
-                          s_tblCmdList[i].pCmd->pstrName )) {
-            return s_tblCmdList[i].pPrivateData;
-        }
-    }
-    return NULL;
+	for (i = 0; i < s_nCmdListSize; i++) {
+		if (strcmp(pstrName, s_tblCmdList[i].pCmd->pstrName) == 0)
+			return s_tblCmdList[i].pPrivateData;
+	}
+	return NULL;
 }
