@@ -1,7 +1,7 @@
 /************************************************************************
 
 
-                                 dmm.h
+			dmm.h
 
 2008/09  morimoto
 ************************************************************************/
@@ -11,7 +11,7 @@
 //======================================================================
 //
 //
-//                                include
+//			include
 //
 //
 //======================================================================
@@ -24,7 +24,7 @@
 //======================================================================
 //
 //
-//                               define
+//			define
 //
 //
 //======================================================================
@@ -39,7 +39,7 @@
 
 //=====================================
 //
-//          type
+//	type
 //
 //=====================================
 typedef unsigned int   u32;
@@ -50,26 +50,26 @@ typedef int REGID;
 
 //=====================================
 //
-//          color print
+//	color print
 //
 //=====================================
-#define BLUE  printf( "\x1b[34m" );
-#define CLAR  printf( "\x1b[0m" );
+#define BLUE  printf("\x1b[34m")
+#define CLAR  printf("\x1b[0m")
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
-#define Error( msg ) _Error( msg , __FUNCTION__ , __LINE__ )
+#define Error(msg) _Error(msg, __func__, __LINE__)
 
 //======================================================================
 //
 //
-//                               function
+//			function
 //
 //
 //======================================================================
-uintptr_t GetAddress( const char* );
-enum ESTYPE GetStype( const char* );
-u32  GetData( const char * );
-bool       _Error( const char * , const char * , int );
+uintptr_t GetAddress(const char *);
+enum ESTYPE GetStype(const char *);
+u32  GetData(const char *);
+bool _Error(const char *, const char *, int);
 
 #include "memctrl.h"
 #include "cmd.h"
