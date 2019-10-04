@@ -61,68 +61,21 @@ static int search_cmd(char *str, int *cmd)
 	return ret;
 }
 
-static int cut_buff(char *buff, int *cmd, unsigned long *addr, unsigned long *val)
+static int buff_parser(char *buff, int *cmd, unsigned long *addr,
+		       unsigned long *val)
 {
 	char str[64];
-	int i;
 	int ret;
 
-	/* get command name */
-	i = 0;
-	while (*buff != ' ')
-		str[i++] = *buff++;
-
-	str[i] = '\0';
-
-	pr_debug("  cmd : [%s] ", str);
-
-	while (*buff == ' ')
-		buff++;
+	ret = sscanf(buff, "%63s %lx %lx", str, addr, val);
+	pr_debug("  cmd : [%s]\n  addr: [%lx]\n  val : [%lx]\n", str, *addr,
+								*val);
+	if ((ret < 2) ||
+	    (str[0] == 'w' && ret < 3))
+		return -EINVAL;
 
 	if (search_cmd(str, cmd))
 		return -EINVAL;
-
-	pr_debug("(%02X)\n", *cmd);
-
-	/* get addr */
-	i = 0;
-	while (*buff != ' ' && *buff != '\0')
-		str[i++] = *buff++;
-
-	str[i] = '\0';
-
-	pr_debug("  addr : [%s] ", str);
-
-	ret = kstrtoul(str, 0, addr);
-	if (ret) {
-		pr_info("error(%d)  Invalid addr [%s]\n", ret, str);
-		return -1;
-	}
-
-	while (*buff == ' ')
-		buff++;
-
-	pr_debug("(%lX)\n", *addr);
-
-	/* get Value */
-	if (*cmd == D_MEM_WRITE || *cmd == D_MEM_WRITE_W ||
-			*cmd == D_MEM_WRITE_D) {
-		i = 0;
-		while (*buff != '\0')
-			str[i++] = *buff++;
-
-		str[i] = '\0';
-
-		pr_debug("val : %s(", str);
-
-		ret = kstrtoul(str, 0, val);
-		if (ret) {
-			pr_info("error(%d)  Invalid value [%s]\n", ret, str);
-			return -1;
-		}
-
-		pr_debug("%lX)\n", *val);
-	}
 
 	return 0;
 }
@@ -229,7 +182,7 @@ ssize_t memd_proc_write(struct file *file, const char *buffer, size_t count, lof
 
 	pr_debug("Recv Command : [%s] (len = %ld)\n", buff, len);
 
-	if (cut_buff(buff, &cmd, &addr, &val))
+	if (buff_parser(buff, &cmd, &addr, &val))
 		return -EINVAL;
 
 	switch (cmd) {
