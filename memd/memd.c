@@ -42,30 +42,12 @@ enum cmd_name {
 	D_MEM_DUMP,
 };
 
-static int search_cmd(char *str, int *cmd)
-{
-	int i;
-	int ret = -1;
-
-	for (i = 0; str[i] != '\0'; i++)
-		str[i] = tolower(str[i]);
-
-	for (i = 0; i < NUM_CMD; i++) {
-		if (!strcmp(str, cmd_name[i])) {
-			*cmd = i;
-			ret = 0;
-			break;
-		}
-	}
-
-	return ret;
-}
-
 static int buff_parser(char *buff, int *cmd, unsigned long *addr,
 		       unsigned long *val)
 {
 	char str[64];
 	int ret;
+	int i;
 
 	ret = sscanf(buff, "%63s %lx %lx", str, addr, val);
 	pr_debug("  cmd : [%s]\n  addr: [%lx]\n  val : [%lx]\n", str, *addr,
@@ -74,10 +56,15 @@ static int buff_parser(char *buff, int *cmd, unsigned long *addr,
 	    (str[0] == 'w' && ret < 3))
 		return -EINVAL;
 
-	if (search_cmd(str, cmd))
-		return -EINVAL;
+	/* get command ID */
+	for (i = 0; i < NUM_CMD; i++) {
+		if (!strcmp(str, cmd_name[i])) {
+			*cmd = i;
+			return 0;
+		}
+	}
 
-	return 0;
+	return -EINVAL;
 }
 
 
