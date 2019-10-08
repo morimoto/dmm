@@ -167,6 +167,8 @@ ssize_t memd_proc_write(struct file *file, const char *buffer, size_t count, lof
 	unsigned long addr;
 	unsigned long val;
 
+	if (len > RECV_BUFF_SIZE)
+		return -EINVAL;
 	if (copy_from_user(buff, buffer, len))
 		return -EFAULT;
 
