@@ -222,7 +222,7 @@ static int memd_init(void)
 {
 	struct proc_dir_entry *entry;
 
-	entry = proc_create_data(PROCNAME, 0666, NULL, &entry_proc_fops, NULL);
+	entry = proc_create_data(PROCNAME, 0600, NULL, &entry_proc_fops, NULL);
 	pr_info("memd driver loaded\n");
 
 	return 0;
