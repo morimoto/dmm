@@ -113,15 +113,15 @@ int mem_write(unsigned long addr, unsigned long val, int size)
 	switch (size) {
 	case 1:
 		writeb(val, reg);
-		pr_info("  mem write [%08lX] : %02lX\n", addr, val);
+		pr_debug("  mem write [%08lX] : %02lX\n", addr, val);
 		break;
 	case 2:
 		writew(val, reg);
-		pr_info("  mem write [%08lX] : %04lX\n", addr, val);
+		pr_debug("  mem write [%08lX] : %04lX\n", addr, val);
 		break;
 	case 4:
 		writel(val, reg);
-		pr_info("  mem write [%08lX] : %08lX\n", addr, val);
+		pr_debug("  mem write [%08lX] : %08lX\n", addr, val);
 		break;
 	}
 
