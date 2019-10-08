@@ -20,6 +20,9 @@
 MODULE_LICENSE("GPL");
 
 #define PROCNAME "reg"
+#define RECV_BUFF_SIZE 256
+#define STR_SIZE 64
+#define FMT_SIZE 32
 
 static char *cmd_name[] = {
 	"r"  ,	/* memory read   8bit   */
@@ -45,11 +48,13 @@ enum cmd_name {
 static int buff_parser(char *buff, int *cmd, unsigned long *addr,
 		       unsigned long *val)
 {
-	char str[64];
+	char str[STR_SIZE];
+	char fmt[FMT_SIZE];
 	int ret;
 	int i;
 
-	ret = sscanf(buff, "%63s %lx %lx", str, addr, val);
+	sprintf(fmt, "%%%ds %%lx %%lx", STR_SIZE-1);
+	ret = sscanf(buff, fmt, str, addr, val);
 	pr_debug("  cmd : [%s]\n  addr: [%lx]\n  val : [%lx]\n", str, *addr,
 								*val);
 	if ((ret < 2) ||
@@ -155,7 +160,7 @@ int mem_dump(unsigned long addr, int size)
 
 ssize_t memd_proc_write(struct file *file, const char *buffer, size_t count, loff_t *pos)
 {
-	char buff[256];
+	char buff[RECV_BUFF_SIZE];
 	unsigned long len = count;
 	int ret;
 	int cmd;
