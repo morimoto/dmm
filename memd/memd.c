@@ -24,16 +24,6 @@ MODULE_LICENSE("GPL");
 #define STR_SIZE 64
 #define FMT_SIZE 32
 
-static char *cmd_name[] = {
-	"r"  ,	/* memory read   8bit   */
-	"rw" ,	/*              16bit   */
-	"rd" ,	/*              32bit   */
-	"w"  ,	/* memory write  8bit   */
-	"ww" ,	/*              16bit   */
-	"wd" ,	/*              32bit   */
-	"md" ,  /* memory dump */
-};
-
 enum cmd_name {
 	D_MEM_READ,
 	D_MEM_READ_W,
@@ -43,6 +33,16 @@ enum cmd_name {
 	D_MEM_WRITE_D,
 	D_MEM_DUMP,
 	D_MEM_NUM,
+};
+
+static char *cmd_name[] = {
+	[D_MEM_READ]    = "r",	/* memory read   8bit   */
+	[D_MEM_READ_W]  = "rw",	/*              16bit   */
+	[D_MEM_READ_D]  = "rd",	/*              32bit   */
+	[D_MEM_WRITE]   = "w",	/* memory write  8bit   */
+	[D_MEM_WRITE_W] = "ww",	/*              16bit   */
+	[D_MEM_WRITE_D] = "wd",	/*              32bit   */
+	[D_MEM_DUMP]    = "md",	/* memory dump */
 };
 
 static int buff_parser(char *buff, int *cmd, unsigned long *addr,
