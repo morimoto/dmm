@@ -20,7 +20,6 @@
 MODULE_LICENSE("GPL");
 
 #define PROCNAME "reg"
-#define NUM_CMD 7
 
 static char *cmd_name[] = {
 	"r"  ,	/* memory read   8bit   */
@@ -40,6 +39,7 @@ enum cmd_name {
 	D_MEM_WRITE_W,
 	D_MEM_WRITE_D,
 	D_MEM_DUMP,
+	D_MEM_NUM,
 };
 
 static int buff_parser(char *buff, int *cmd, unsigned long *addr,
@@ -57,7 +57,7 @@ static int buff_parser(char *buff, int *cmd, unsigned long *addr,
 		return -EINVAL;
 
 	/* get command ID */
-	for (i = 0; i < NUM_CMD; i++) {
+	for (i = 0; i < D_MEM_NUM; i++) {
 		if (!strcmp(str, cmd_name[i])) {
 			*cmd = i;
 			return 0;
