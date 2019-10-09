@@ -82,7 +82,7 @@ int mem_read(unsigned long addr, int size)
 	reg = (char *)ioremap_nocache(addr, size);
 	if (!reg) {
 		pr_err("  ioremap fail [%08lX]\n", addr);
-		return -1;
+		return -ENOMEM;
 	}
 
 	switch (size) {
@@ -112,7 +112,7 @@ int mem_write(unsigned long addr, unsigned long val, int size)
 	reg = ioremap_nocache(addr, size);
 	if (!reg) {
 		pr_err("  ioremap fail [%08lX]\n", addr);
-		return -1;
+		return -ENOMEM;
 	}
 
 	switch (size) {
@@ -203,13 +203,10 @@ ssize_t memd_proc_write(struct file *file, const char *buffer, size_t count, lof
 		break;
 	default:
 		pr_err("  Fatal error\n");
-		ret = -1;
+		ret = -EINVAL;
 	}
 
-	if (ret)
-		return -EINVAL;
-
-	return len;
+	return ret ? : len;
 }
 
 
