@@ -1,7 +1,8 @@
 /*
  * memd
  *
- * Hiroyuki Yokoyama <hiroyuki.yokoyama.vx@renesas.com>
+ * Copyright (c) 20?? Hiroyuki Yokoyama <hiroyuki.yokoyama.vx@renesas.com>
+ * Copyright (c) 2019 Yuya Hamamachi <yuya.hamamachi.sx@renesas.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
