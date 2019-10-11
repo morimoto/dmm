@@ -17,8 +17,6 @@
 #include <linux/uaccess.h>
 #include <linux/io.h>
 
-MODULE_LICENSE("GPL");
-
 #define PROCNAME "reg"
 #define RECV_BUFF_SIZE 256
 #define STR_SIZE 64
@@ -234,3 +232,4 @@ static void memd_exit(void)
 module_init(memd_init);
 module_exit(memd_exit);
 
+MODULE_LICENSE("GPL v2");
