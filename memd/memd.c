@@ -1,13 +1,9 @@
-/*
- * memd
- *
- * Copyright (c) 20?? Hiroyuki Yokoyama <hiroyuki.yokoyama.vx@renesas.com>
- * Copyright (c) 2019 Yuya Hamamachi <yuya.hamamachi.sx@renesas.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- */
+// SPDX-License-Identifier: GPL-2.0-only
+//
+// memd
+//
+// Copyright (c) 20?? Hiroyuki Yokoyama <hiroyuki.yokoyama.vx@renesas.com>
+// Copyright (c) 2019 Yuya Hamamachi <yuya.hamamachi.sx@renesas.com>
 
 #include <linux/module.h>
 #include <linux/init.h>
