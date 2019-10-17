@@ -31,6 +31,29 @@
 		> vi .config
 		> make
 
+	クロスコンパイルの場合は、カーネルコンパイル時と同様のオプションが必要
+
+		> ARCH=arm64 CROSS_COMPILE="aarch64-linux-gnu-" make
+
 	その後、memd.ko をコピー
 
 		> cp memd.ko ${PATH}
+
+====================
+* FAQ
+====================
+
+**	Q. make すると asm/types.h が無いとか言われるけど？
+
+	--------------
+	CC memd.ko
+	In file included from ${LINUX}/include/linux/types.h:6:0,
+	                 from ${LINUX}/include/linux/list.h:5,
+	                 from ${LINUX}/include/linux/module.h:9,
+	                 from dmm/memd/memd.c:8:
+	${LINUX}/include/uapi/linux/types.h:5:23: fatal error: asm/types.h: そのようなファイルやディレクトリはありません
+	--------------
+
+	A. クロスコンパイル用に使用した設定忘れてない？
+
+	「コンパイル方法」参照
