@@ -8,7 +8,7 @@ obj-m := memd.o
 
 memd.ko : memd.c
 	@echo "CC $@"
-	@make -s -C $(KPATH) -I$(KPATH)/include M=$(TOP) modules
+	@make -s -C $(KPATH) M=$(TOP) modules
 
 clean :
 	@make -s -C $(KPATH) -r M=$(TOP) clean
