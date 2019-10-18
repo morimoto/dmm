@@ -6,6 +6,7 @@
 2008/09  morimoto
 ************************************************************************/
 #include "dmm.h"
+#include "../version.h"
 
 //======================================================================
 //
@@ -27,7 +28,7 @@ static STHELPMSG s_Help[] = {
 //=====================================
 static bool cmd(int nArgc, char *pstrArgv[])
 {
-	printf("version %s\n", VERSION);
+	printf("version %s\n", version);
 	return true;
 }
 

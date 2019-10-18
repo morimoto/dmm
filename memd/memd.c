@@ -13,6 +13,7 @@
 #include <linux/ctype.h>
 #include <linux/uaccess.h>
 #include <linux/io.h>
+#include "../version.h"
 
 #define PROCNAME "reg"
 #define RECV_BUFF_SIZE 256
@@ -228,7 +229,7 @@ static const struct file_operations entry_proc_fops = {
 static int memd_init(void)
 {
 	proc_create_data(PROCNAME, 0600, NULL, &entry_proc_fops, NULL);
-	pr_info("memd driver loaded\n");
+	pr_info("memd driver loaded (%s)\n", version);
 
 	return 0;
 }

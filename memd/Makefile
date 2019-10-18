@@ -6,7 +6,7 @@ all : memd.ko
 
 obj-m := memd.o
 
-memd.ko : memd.c
+memd.ko : memd.c ${TOP}/../version.h
 	@echo "CC $@"
 	@make -s -C $(KPATH) M=$(TOP) modules
 
