@@ -45,7 +45,7 @@ int main(int nArgc, char *pstrArgv[])
 	//	check param
 	//
 	//=====================================
-	if (nArgc > 2)
+	if (nArgc < 2)
 		return Usage("parameter is nedded");
 
 	// shift arg
