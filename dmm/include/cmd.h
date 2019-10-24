@@ -48,15 +48,6 @@ typedef struct cmd {
 	bool		(*fnCmd)(int, char **);
 } STCMD;
 
-//=====================================
-//
-//	STCMD
-//
-//=====================================
-typedef struct cmdlist {
-	const STCMD *pCmd;
-} STCMDLIST;
-
 //======================================================================
 //
 //
@@ -87,10 +78,7 @@ typedef struct cmdlist {
 //
 //=====================================
 #define CMD_EXTERN(name) extern STCMD cmd_##name;
-#define CMD_DEFINE(name)			\
-	{					\
-		.pCmd		= &cmd_##name,	\
-	},
+#define CMD_DEFINE(name) &cmd_##name,
 
 #define CMD_LIST_SIZE static int s_nCmdListSize = ARRAY_SIZE(s_tblCmdList);
 

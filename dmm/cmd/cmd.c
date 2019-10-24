@@ -143,5 +143,5 @@ const STCMD *GetCmdList(int ixCmd)
 		return NULL;
 	}
 
-	return s_tblCmdList[ixCmd].pCmd;
+	return s_tblCmdList[ixCmd];
 }
