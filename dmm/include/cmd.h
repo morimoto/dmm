@@ -55,7 +55,6 @@ typedef struct cmd {
 //=====================================
 typedef struct cmdlist {
 	const STCMD *pCmd;
-	void *pPrivateData;
 } STCMDLIST;
 
 //======================================================================
@@ -91,7 +90,6 @@ typedef struct cmdlist {
 #define CMD_DEFINE(name)			\
 	{					\
 		.pCmd		= &cmd_##name,	\
-		.pPrivateData	= NULL,		\
 	},
 
 #define CMD_LIST_SIZE static int s_nCmdListSize = ARRAY_SIZE(s_tblCmdList);
@@ -111,14 +109,6 @@ enum ESTYPE CmdGetDataSize(char *, enum ESTYPE);
 
 int GetCmdListSize(void);
 const STCMD *GetCmdList(int);
-
-//=====================================
-//
-//	for cpu
-//
-//=====================================
-void SetCmdData(const char *, void *);
-void *GetCmdData(const char *);
 
 #endif
 

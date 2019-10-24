@@ -145,36 +145,3 @@ const STCMD *GetCmdList(int ixCmd)
 
 	return s_tblCmdList[ixCmd].pCmd;
 }
-
-//=====================================
-//
-//	SetCmdData
-//
-//=====================================
-void SetCmdData(const char *pstrName, void *pData)
-{
-	int i;
-
-	for (i = 0; i < GetCmdListSize(); i++) {
-		if (strcmp(pstrName, s_tblCmdList[i].pCmd->pstrName) == 0) {
-			s_tblCmdList[i].pPrivateData = pData;
-			break;
-		}
-	}
-}
-
-//=====================================
-//
-//	GetCmdData
-//
-//=====================================
-void *GetCmdData(const char *pstrName)
-{
-	int i;
-
-	for (i = 0; i < GetCmdListSize(); i++) {
-		if (strcmp(pstrName, s_tblCmdList[i].pCmd->pstrName) == 0)
-			return s_tblCmdList[i].pPrivateData;
-	}
-	return NULL;
-}
