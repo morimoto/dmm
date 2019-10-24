@@ -51,9 +51,9 @@ bool Usage(const char *pMsg)
 	printf("[ %s ]\n", pMsg);
 
 	// print --XXX option
-	for (i = 0; i < s_nCmdListSize; i++) {
+	for (i = 0; i < GetCmdListSize(); i++) {
 
-		phelp = s_tblCmdList[i].pCmd->pHelp;
+		phelp = GetCmdList(i)->pHelp;
 		while (phelp->pstrCmd) {
 			if ((strlen(phelp->pstrCmd) > 2) &&
 			    ('-' == phelp->pstrCmd[0])   &&
@@ -66,9 +66,9 @@ bool Usage(const char *pMsg)
 	}
 
 	// print other help
-	for (i = 0; i < s_nCmdListSize; i++) {
+	for (i = 0; i < GetCmdListSize(); i++) {
 
-		phelp = s_tblCmdList[i].pCmd->pHelp;
+		phelp = GetCmdList(i)->pHelp;
 		while (phelp->pstrCmd) {
 			if ('-' != phelp->pstrCmd[0])
 				printf("%-15s : %s\n",
@@ -138,7 +138,7 @@ int GetCmdListSize(void)
 const STCMD *GetCmdList(int ixCmd)
 {
 	if (ixCmd < 0 ||
-	    s_nCmdListSize <= ixCmd) {
+	    GetCmdListSize() <= ixCmd) {
 		Error("Cmd List index error");
 		return NULL;
 	}
@@ -155,7 +155,7 @@ void SetCmdData(const char *pstrName, void *pData)
 {
 	int i;
 
-	for (i = 0; i < s_nCmdListSize; i++) {
+	for (i = 0; i < GetCmdListSize(); i++) {
 		if (strcmp(pstrName, s_tblCmdList[i].pCmd->pstrName) == 0) {
 			s_tblCmdList[i].pPrivateData = pData;
 			break;
@@ -172,7 +172,7 @@ void *GetCmdData(const char *pstrName)
 {
 	int i;
 
-	for (i = 0; i < s_nCmdListSize; i++) {
+	for (i = 0; i < GetCmdListSize(); i++) {
 		if (strcmp(pstrName, s_tblCmdList[i].pCmd->pstrName) == 0)
 			return s_tblCmdList[i].pPrivateData;
 	}
