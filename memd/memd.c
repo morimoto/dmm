@@ -171,8 +171,9 @@ ssize_t memd_proc_write(struct file *file, const char *buffer, size_t count, lof
 
 	pr_debug("Recv Command : [%s] (len = %ld)\n", buff, len);
 
-	if (buff_parser(buff, &cmd, &addr, &val))
-		return -EINVAL;
+	ret = buff_parser(buff, &cmd, &addr, &val);
+	if (ret)
+		return ret;
 
 	switch (cmd) {
 	case D_MEM_READ:
