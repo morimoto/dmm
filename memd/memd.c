@@ -71,10 +71,10 @@ static int buff_parser(char *buff, int *cmd, unsigned long *addr,
 
 int mem_read(unsigned long addr, int size)
 {
-	char *reg;
+	void __iomem *reg;
 	long val;
 
-	reg = (char *)ioremap_nocache(addr, size);
+	reg = ioremap_nocache(addr, size);
 	if (!reg) {
 		pr_err("  ioremap fail [%08lX]\n", addr);
 		return -ENOMEM;
@@ -102,7 +102,7 @@ int mem_read(unsigned long addr, int size)
 
 int mem_write(unsigned long addr, unsigned long val, int size)
 {
-	char *reg;
+	void __iomem *reg;
 
 	reg = ioremap_nocache(addr, size);
 	if (!reg) {
@@ -133,11 +133,11 @@ int mem_write(unsigned long addr, unsigned long val, int size)
 
 int mem_dump(unsigned long addr, int size)
 {
-	char *reg;
+	void __iomem  *reg;
 	long val;
 	int i;
 
-	reg = (char *)ioremap_nocache(addr, size);
+	reg = ioremap_nocache(addr, size);
 	if (!reg) {
 		pr_err("  ioremap fail [%08lX]\n", addr);
 		return -ENOMEM;
@@ -153,7 +153,8 @@ int mem_dump(unsigned long addr, int size)
 	return 0;
 }
 
-ssize_t memd_proc_write(struct file *file, const char *buffer, size_t count, loff_t *pos)
+ssize_t memd_proc_write(struct file *file, const char __user *buffer,
+			size_t count, loff_t *pos)
 {
 	char buff[RECV_BUFF_SIZE];
 	unsigned long len = count;
