@@ -72,7 +72,7 @@ static int buff_parser(char *buff, int *cmd, unsigned long *addr,
 int mem_read(unsigned long addr, int size)
 {
 	void __iomem *reg;
-	long val;
+	long val = -1;
 
 	reg = ioremap_nocache(addr, size);
 	if (!reg) {
@@ -83,17 +83,15 @@ int mem_read(unsigned long addr, int size)
 	switch (size) {
 	case 1:
 		val = readb(reg);
-		pr_info("  mem read [%08lX] : %02lX\n", addr, val);
 		break;
 	case 2:
 		val = readw(reg);
-		pr_info("  mem read [%08lX] : %04lX\n", addr, val);
 		break;
 	case 4:
 		val = readl(reg);
-		pr_info("  mem read [%08lX] : %08lX\n", addr, val);
 		break;
 	}
+	pr_info("  mem read [%08lX] : %0*lX\n", addr, size*2, val);
 
 	iounmap(reg);
 
@@ -113,17 +111,15 @@ int mem_write(unsigned long addr, unsigned long val, int size)
 	switch (size) {
 	case 1:
 		writeb(val, reg);
-		pr_debug("  mem write [%08lX] : %02lX\n", addr, val);
 		break;
 	case 2:
 		writew(val, reg);
-		pr_debug("  mem write [%08lX] : %04lX\n", addr, val);
 		break;
 	case 4:
 		writel(val, reg);
-		pr_debug("  mem write [%08lX] : %08lX\n", addr, val);
 		break;
 	}
+	pr_debug("  mem write [%08lX] : %0*lX\n", addr, size*2, val);
 
 	iounmap(reg);
 
