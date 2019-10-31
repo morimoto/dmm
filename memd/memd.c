@@ -107,7 +107,7 @@ static int buff_parser(const char __user *buffer, unsigned long buffer_len,
 	case D_MEM_DUMP:
 		if (arguments_num < 2)
 			return -EINVAL;
-		prm->mapping_size = 0x80;
+		prm->mapping_size = (arguments_num < 3) ? 0x80 : prm->val;
 		break;
 	}
 
@@ -159,18 +159,25 @@ int mem_write(const struct cmd_param *prm)
 
 int mem_dump(const struct cmd_param *prm)
 {
-	long val;
+	struct cmd_param tmp;
 	int i;
+	int ret;
 
-	if (prm->access_size != 4) {
-		pr_warn("  md is used instead of m/mw.\n");
-		pr_warn("  %s supports 4 bytes access only, for now.\n",
-								      __func__);
-	}
-
-	for (i = 0; i < prm->mapping_size/4; i += 4) {
-		val = readl(prm->reg + i);
-		pr_info("  mem read [%08lX] : %08lX\n", prm->addr + i, val);
+	/*
+	 * mem_dump() needs to update addr/reg,
+	 * and we need to use const *prm.
+	 * see
+	 *	memd_proc_write() :: iounmap()
+	 *
+	 * Here uses copied cmd_param
+	 */
+	tmp = *prm;
+	for (i = 0; i < tmp.mapping_size; i += tmp.access_size) {
+		ret = mem_read(&tmp);
+		if (ret)
+			return ret;
+		tmp.addr += tmp.access_size;
+		tmp.reg += tmp.access_size;
 	}
 
 	return 0;
