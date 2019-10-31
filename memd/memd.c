@@ -42,12 +42,21 @@ struct cmd_param {
 	unsigned long mapping_size;
 };
 
-static int buff_parser(char *buff, struct cmd_param *prm)
+static int buff_parser(const char __user *buffer, unsigned long buffer_len,
+		       struct cmd_param *prm)
 {
+	char buff[RECV_BUFF_SIZE];
 	char str[STR_SIZE];
 	char fmt[FMT_SIZE];
 	int arguments_num;
 	int i;
+
+	if (buffer_len >= RECV_BUFF_SIZE)
+		return -EINVAL;
+	if (copy_from_user(buff, buffer, buffer_len))
+		return -EFAULT;
+	buff[buffer_len] = '\0';
+	pr_debug("Recv Command : [%s] (len = %ld)\n", buff, buffer_len);
 
 	sprintf(fmt, "%%%ds %%lx %%lx", STR_SIZE-1);
 	arguments_num = sscanf(buff, fmt, str, &prm->addr, &prm->val);
@@ -170,21 +179,11 @@ int mem_dump(const struct cmd_param *prm)
 ssize_t memd_proc_write(struct file *file, const char __user *buffer,
 			size_t count, loff_t *pos)
 {
-	char buff[RECV_BUFF_SIZE];
 	unsigned long len = count;
 	int ret;
 	struct cmd_param prm;
 
-	if (len >= RECV_BUFF_SIZE)
-		return -EINVAL;
-	if (copy_from_user(buff, buffer, len))
-		return -EFAULT;
-
-	buff[len] = '\0';
-
-	pr_debug("Recv Command : [%s] (len = %ld)\n", buff, len);
-
-	ret = buff_parser(buff, &prm);
+	ret = buff_parser(buffer, len, &prm);
 	if (ret)
 		return ret;
 
