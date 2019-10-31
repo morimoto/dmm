@@ -33,8 +33,14 @@ static char cmd_name[] = {
 	[D_MEM_DUMP]    = 'm',	/* memory dump */
 };
 
-static int buff_parser(char *buff, int *cmd, unsigned long *addr,
-		       unsigned long *val, int *access_size)
+struct cmd_param {
+	int cmd;
+	unsigned long addr;
+	unsigned long val;
+	int access_size;
+};
+
+static int buff_parser(char *buff, struct cmd_param *prm)
 {
 	char str[STR_SIZE];
 	char fmt[FMT_SIZE];
@@ -42,14 +48,14 @@ static int buff_parser(char *buff, int *cmd, unsigned long *addr,
 	int i;
 
 	sprintf(fmt, "%%%ds %%lx %%lx", STR_SIZE-1);
-	arguments_num = sscanf(buff, fmt, str, addr, val);
-	pr_debug("  cmd : [%s]\n  addr: [%lx]\n  val : [%lx]\n", str, *addr,
-								*val);
+	arguments_num = sscanf(buff, fmt, str, &prm->addr, &prm->val);
+	pr_debug("  cmd : [%s]\n  addr: [%lx]\n  val : [%lx]\n", str, prm->addr,
+								prm->val);
 
 	/* get command ID */
 	for (i = 0; i < D_MEM_NUM; i++) {
 		if (str[0] == cmd_name[i]) {
-			*cmd = i;
+			prm->cmd = i;
 			break;
 		}
 	}
@@ -59,13 +65,13 @@ static int buff_parser(char *buff, int *cmd, unsigned long *addr,
 	/* get access_size */
 	switch (str[1]) {
 	case '\0':
-		*access_size = 1;
+		prm->access_size = 1;
 		break;
 	case 'w':
-		*access_size = 2;
+		prm->access_size = 2;
 		break;
 	case 'd':
-		*access_size = 4;
+		prm->access_size = 4;
 		break;
 	default:
 		return -EINVAL;
@@ -76,7 +82,7 @@ static int buff_parser(char *buff, int *cmd, unsigned long *addr,
 		return -EINVAL;
 
 	/* check argument */
-	switch (*cmd) {
+	switch (prm->cmd) {
 	case D_MEM_READ:
 	case D_MEM_DUMP:
 		if (arguments_num < 2)
@@ -93,18 +99,18 @@ static int buff_parser(char *buff, int *cmd, unsigned long *addr,
 
 
 
-int mem_read(unsigned long addr, int size)
+int mem_read(const struct cmd_param *prm)
 {
 	void __iomem *reg;
 	long val = -1;
 
-	reg = ioremap_nocache(addr, size);
+	reg = ioremap_nocache(prm->addr, prm->access_size);
 	if (!reg) {
-		pr_err("  ioremap fail [%08lX]\n", addr);
+		pr_err("  ioremap fail [%08lX]\n", prm->addr);
 		return -ENOMEM;
 	}
 
-	switch (size) {
+	switch (prm->access_size) {
 	case 1:
 		val = readb(reg);
 		break;
@@ -115,35 +121,37 @@ int mem_read(unsigned long addr, int size)
 		val = readl(reg);
 		break;
 	}
-	pr_info("  mem read [%08lX] : %0*lX\n", addr, size*2, val);
+	pr_info("  mem read [%08lX] : %0*lX\n", prm->addr, prm->access_size*2,
+						val);
 
 	iounmap(reg);
 
 	return 0;
 }
 
-int mem_write(unsigned long addr, unsigned long val, int size)
+int mem_write(const struct cmd_param *prm)
 {
 	void __iomem *reg;
 
-	reg = ioremap_nocache(addr, size);
+	reg = ioremap_nocache(prm->addr, prm->access_size);
 	if (!reg) {
-		pr_err("  ioremap fail [%08lX]\n", addr);
+		pr_err("  ioremap fail [%08lX]\n", prm->addr);
 		return -ENOMEM;
 	}
 
-	switch (size) {
+	switch (prm->access_size) {
 	case 1:
-		writeb(val, reg);
+		writeb(prm->val, reg);
 		break;
 	case 2:
-		writew(val, reg);
+		writew(prm->val, reg);
 		break;
 	case 4:
-		writel(val, reg);
+		writel(prm->val, reg);
 		break;
 	}
-	pr_debug("  mem write [%08lX] : %0*lX\n", addr, size*2, val);
+	pr_debug("  mem write [%08lX] : %0*lX\n", prm->addr, prm->access_size*2,
+						  prm->val);
 
 	iounmap(reg);
 
@@ -151,19 +159,19 @@ int mem_write(unsigned long addr, unsigned long val, int size)
 }
 
 
-int mem_dump(unsigned long addr, int access_size, int size)
+int mem_dump(const struct cmd_param *prm, int size)
 {
 	void __iomem  *reg;
 	long val;
 	int i;
 
-	reg = ioremap_nocache(addr, size);
+	reg = ioremap_nocache(prm->addr, size);
 	if (!reg) {
-		pr_err("  ioremap fail [%08lX]\n", addr);
+		pr_err("  ioremap fail [%08lX]\n", prm->addr);
 		return -ENOMEM;
 	}
 
-	if (access_size != 4) {
+	if (prm->access_size != 4) {
 		pr_warn("  md is used instead of m/mw.\n");
 		pr_warn("  %s supports 4 bytes access only, for now.\n",
 								      __func__);
@@ -171,7 +179,7 @@ int mem_dump(unsigned long addr, int access_size, int size)
 
 	for (i = 0; i < size/4; i += 4 ) {
 		val = readl(reg + i);
-		pr_info("  mem read [%08lX] : %08lX\n", addr + i, val);
+		pr_info("  mem read [%08lX] : %08lX\n", prm->addr + i, val);
 	}
 
 	iounmap(reg);
@@ -185,10 +193,7 @@ ssize_t memd_proc_write(struct file *file, const char __user *buffer,
 	char buff[RECV_BUFF_SIZE];
 	unsigned long len = count;
 	int ret;
-	int cmd;
-	unsigned long addr;
-	unsigned long val;
-	int access_size;
+	struct cmd_param prm;
 
 	if (len >= RECV_BUFF_SIZE)
 		return -EINVAL;
@@ -199,19 +204,19 @@ ssize_t memd_proc_write(struct file *file, const char __user *buffer,
 
 	pr_debug("Recv Command : [%s] (len = %ld)\n", buff, len);
 
-	ret = buff_parser(buff, &cmd, &addr, &val, &access_size);
+	ret = buff_parser(buff, &prm);
 	if (ret)
 		return ret;
 
-	switch (cmd) {
+	switch (prm.cmd) {
 	case D_MEM_READ:
-		ret = mem_read(addr, access_size);
+		ret = mem_read(&prm);
 		break;
 	case D_MEM_WRITE:
-		ret = mem_write(addr, val, access_size);
+		ret = mem_write(&prm);
 		break;
 	case D_MEM_DUMP:
-		ret = mem_dump(addr, access_size, 0x80);
+		ret = mem_dump(&prm, 0x80);
 		break;
 	default:
 		pr_err("  Fatal error\n");
