@@ -18,53 +18,77 @@
 #define RECV_BUFF_SIZE 256
 #define STR_SIZE 64
 #define FMT_SIZE 32
+#define MAX_COMMAND_LENGTH 2
 
 enum cmd_name {
 	D_MEM_READ,
-	D_MEM_READ_W,
-	D_MEM_READ_D,
 	D_MEM_WRITE,
-	D_MEM_WRITE_W,
-	D_MEM_WRITE_D,
 	D_MEM_DUMP,
 	D_MEM_NUM,
 };
 
-static char *cmd_name[] = {
-	[D_MEM_READ]    = "r",	/* memory read   8bit   */
-	[D_MEM_READ_W]  = "rw",	/*              16bit   */
-	[D_MEM_READ_D]  = "rd",	/*              32bit   */
-	[D_MEM_WRITE]   = "w",	/* memory write  8bit   */
-	[D_MEM_WRITE_W] = "ww",	/*              16bit   */
-	[D_MEM_WRITE_D] = "wd",	/*              32bit   */
-	[D_MEM_DUMP]    = "md",	/* memory dump */
+static char cmd_name[] = {
+	[D_MEM_READ]    = 'r',	/* memory read   8bit   */
+	[D_MEM_WRITE]   = 'w',	/* memory write  8bit   */
+	[D_MEM_DUMP]    = 'm',	/* memory dump */
 };
 
 static int buff_parser(char *buff, int *cmd, unsigned long *addr,
-		       unsigned long *val)
+		       unsigned long *val, int *access_size)
 {
 	char str[STR_SIZE];
 	char fmt[FMT_SIZE];
-	int ret;
+	int arguments_num;
 	int i;
 
 	sprintf(fmt, "%%%ds %%lx %%lx", STR_SIZE-1);
-	ret = sscanf(buff, fmt, str, addr, val);
+	arguments_num = sscanf(buff, fmt, str, addr, val);
 	pr_debug("  cmd : [%s]\n  addr: [%lx]\n  val : [%lx]\n", str, *addr,
 								*val);
-	if ((ret < 2) ||
-	    (str[0] == 'w' && ret < 3))
-		return -EINVAL;
 
 	/* get command ID */
 	for (i = 0; i < D_MEM_NUM; i++) {
-		if (!strcmp(str, cmd_name[i])) {
+		if (str[0] == cmd_name[i]) {
 			*cmd = i;
-			return 0;
+			break;
 		}
 	}
+	if (i >= D_MEM_NUM)
+		return -EINVAL;
 
-	return -EINVAL;
+	/* get access_size */
+	switch (str[1]) {
+	case '\0':
+		*access_size = 1;
+		break;
+	case 'w':
+		*access_size = 2;
+		break;
+	case 'd':
+		*access_size = 4;
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	/* check command length */
+	if (strlen(str) > MAX_COMMAND_LENGTH)
+		return -EINVAL;
+
+	/* check argument */
+	switch (*cmd) {
+	case D_MEM_READ:
+	case D_MEM_DUMP:
+		if (arguments_num < 2)
+			return -EINVAL;
+		break;
+	case D_MEM_WRITE:
+		if (arguments_num < 3)
+			return -EINVAL;
+		break;
+	}
+
+	return 0;
 }
 
 
@@ -127,7 +151,7 @@ int mem_write(unsigned long addr, unsigned long val, int size)
 }
 
 
-int mem_dump(unsigned long addr, int size)
+int mem_dump(unsigned long addr, int access_size, int size)
 {
 	void __iomem  *reg;
 	long val;
@@ -137,6 +161,12 @@ int mem_dump(unsigned long addr, int size)
 	if (!reg) {
 		pr_err("  ioremap fail [%08lX]\n", addr);
 		return -ENOMEM;
+	}
+
+	if (access_size != 4) {
+		pr_warn("  md is used instead of m/mw.\n");
+		pr_warn("  %s supports 4 bytes access only, for now.\n",
+								      __func__);
 	}
 
 	for (i = 0; i < size/4; i += 4 ) {
@@ -158,6 +188,7 @@ ssize_t memd_proc_write(struct file *file, const char __user *buffer,
 	int cmd;
 	unsigned long addr;
 	unsigned long val;
+	int access_size;
 
 	if (len >= RECV_BUFF_SIZE)
 		return -EINVAL;
@@ -168,31 +199,19 @@ ssize_t memd_proc_write(struct file *file, const char __user *buffer,
 
 	pr_debug("Recv Command : [%s] (len = %ld)\n", buff, len);
 
-	ret = buff_parser(buff, &cmd, &addr, &val);
+	ret = buff_parser(buff, &cmd, &addr, &val, &access_size);
 	if (ret)
 		return ret;
 
 	switch (cmd) {
 	case D_MEM_READ:
-		ret = mem_read(addr, 1);
-		break;
-	case D_MEM_READ_W:
-		ret = mem_read(addr, 2);
-		break;
-	case D_MEM_READ_D:
-		ret = mem_read(addr, 4);
+		ret = mem_read(addr, access_size);
 		break;
 	case D_MEM_WRITE:
-		ret = mem_write(addr, val, 1);
-		break;
-	case D_MEM_WRITE_W:
-		ret = mem_write(addr, val, 2);
-		break;
-	case D_MEM_WRITE_D:
-		ret = mem_write(addr, val, 4);
+		ret = mem_write(addr, val, access_size);
 		break;
 	case D_MEM_DUMP:
-		ret = mem_dump(addr, 0x80);
+		ret = mem_dump(addr, access_size, 0x80);
 		break;
 	default:
 		pr_err("  Fatal error\n");
