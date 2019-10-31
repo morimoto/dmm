@@ -184,9 +184,8 @@ int mem_dump(const struct cmd_param *prm)
 }
 
 ssize_t memd_proc_write(struct file *file, const char __user *buffer,
-			size_t count, loff_t *pos)
+			size_t len, loff_t *pos)
 {
-	unsigned long len = count;
 	int ret;
 	struct cmd_param prm;
 
