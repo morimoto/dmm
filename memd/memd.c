@@ -35,9 +35,11 @@ static char cmd_name[] = {
 
 struct cmd_param {
 	int cmd;
+	void __iomem *reg;
 	unsigned long addr;
 	unsigned long val;
 	int access_size;
+	unsigned long mapping_size;
 };
 
 static int buff_parser(char *buff, struct cmd_param *prm)
@@ -81,16 +83,22 @@ static int buff_parser(char *buff, struct cmd_param *prm)
 	if (strlen(str) > MAX_COMMAND_LENGTH)
 		return -EINVAL;
 
-	/* check argument */
+	/* get mapping size */
 	switch (prm->cmd) {
 	case D_MEM_READ:
-	case D_MEM_DUMP:
 		if (arguments_num < 2)
 			return -EINVAL;
+		prm->mapping_size = prm->access_size;
 		break;
 	case D_MEM_WRITE:
 		if (arguments_num < 3)
 			return -EINVAL;
+		prm->mapping_size = prm->access_size;
+		break;
+	case D_MEM_DUMP:
+		if (arguments_num < 2)
+			return -EINVAL;
+		prm->mapping_size = 0x80;
 		break;
 	}
 
@@ -101,75 +109,49 @@ static int buff_parser(char *buff, struct cmd_param *prm)
 
 int mem_read(const struct cmd_param *prm)
 {
-	void __iomem *reg;
 	long val = -1;
-
-	reg = ioremap_nocache(prm->addr, prm->access_size);
-	if (!reg) {
-		pr_err("  ioremap fail [%08lX]\n", prm->addr);
-		return -ENOMEM;
-	}
 
 	switch (prm->access_size) {
 	case 1:
-		val = readb(reg);
+		val = readb(prm->reg);
 		break;
 	case 2:
-		val = readw(reg);
+		val = readw(prm->reg);
 		break;
 	case 4:
-		val = readl(reg);
+		val = readl(prm->reg);
 		break;
 	}
 	pr_info("  mem read [%08lX] : %0*lX\n", prm->addr, prm->access_size*2,
 						val);
-
-	iounmap(reg);
 
 	return 0;
 }
 
 int mem_write(const struct cmd_param *prm)
 {
-	void __iomem *reg;
-
-	reg = ioremap_nocache(prm->addr, prm->access_size);
-	if (!reg) {
-		pr_err("  ioremap fail [%08lX]\n", prm->addr);
-		return -ENOMEM;
-	}
-
 	switch (prm->access_size) {
 	case 1:
-		writeb(prm->val, reg);
+		writeb(prm->val, prm->reg);
 		break;
 	case 2:
-		writew(prm->val, reg);
+		writew(prm->val, prm->reg);
 		break;
 	case 4:
-		writel(prm->val, reg);
+		writel(prm->val, prm->reg);
 		break;
 	}
 	pr_debug("  mem write [%08lX] : %0*lX\n", prm->addr, prm->access_size*2,
 						  prm->val);
 
-	iounmap(reg);
-
 	return 0;
 }
 
 
-int mem_dump(const struct cmd_param *prm, int size)
+int mem_dump(const struct cmd_param *prm)
 {
-	void __iomem  *reg;
 	long val;
 	int i;
-
-	reg = ioremap_nocache(prm->addr, size);
-	if (!reg) {
-		pr_err("  ioremap fail [%08lX]\n", prm->addr);
-		return -ENOMEM;
-	}
 
 	if (prm->access_size != 4) {
 		pr_warn("  md is used instead of m/mw.\n");
@@ -177,12 +159,10 @@ int mem_dump(const struct cmd_param *prm, int size)
 								      __func__);
 	}
 
-	for (i = 0; i < size/4; i += 4 ) {
-		val = readl(reg + i);
+	for (i = 0; i < prm->mapping_size/4; i += 4) {
+		val = readl(prm->reg + i);
 		pr_info("  mem read [%08lX] : %08lX\n", prm->addr + i, val);
 	}
-
-	iounmap(reg);
 
 	return 0;
 }
@@ -208,6 +188,12 @@ ssize_t memd_proc_write(struct file *file, const char __user *buffer,
 	if (ret)
 		return ret;
 
+	prm.reg = ioremap_nocache(prm.addr, prm.mapping_size);
+	if (!prm.reg) {
+		pr_err("  ioremap fail [%08lX]\n", prm.addr);
+		return -ENOMEM;
+	}
+
 	switch (prm.cmd) {
 	case D_MEM_READ:
 		ret = mem_read(&prm);
@@ -216,12 +202,14 @@ ssize_t memd_proc_write(struct file *file, const char __user *buffer,
 		ret = mem_write(&prm);
 		break;
 	case D_MEM_DUMP:
-		ret = mem_dump(&prm, 0x80);
+		ret = mem_dump(&prm);
 		break;
 	default:
 		pr_err("  Fatal error\n");
 		ret = -EINVAL;
 	}
+
+	iounmap(prm.reg);
 
 	return ret ? : len;
 }
