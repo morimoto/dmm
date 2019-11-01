@@ -28,9 +28,9 @@ enum cmd_name {
 };
 
 static char cmd_name[] = {
-	[D_MEM_READ]    = 'r',	/* memory read   8bit   */
-	[D_MEM_WRITE]   = 'w',	/* memory write  8bit   */
-	[D_MEM_DUMP]    = 'm',	/* memory dump */
+	[D_MEM_READ]  = 'r',	/* memory read   8bit */
+	[D_MEM_WRITE] = 'w',	/* memory write  8bit */
+	[D_MEM_DUMP]  = 'm',	/* memory dump */
 };
 
 struct cmd_param {
@@ -53,15 +53,17 @@ static int buff_parser(const char __user *buffer, unsigned long buffer_len,
 
 	if (buffer_len >= RECV_BUFF_SIZE)
 		return -EINVAL;
+
 	if (copy_from_user(buff, buffer, buffer_len))
 		return -EFAULT;
+
 	buff[buffer_len] = '\0';
 	pr_debug("Recv Command : [%s] (len = %ld)\n", buff, buffer_len);
 
 	sprintf(fmt, "%%%ds %%lx %%lx", STR_SIZE-1);
 	arguments_num = sscanf(buff, fmt, str, &prm->addr, &prm->val);
-	pr_debug("  cmd : [%s]\n  addr: [%lx]\n  val : [%lx]\n", str, prm->addr,
-								prm->val);
+	pr_debug("  cmd : [%s]\n  addr: [%lx]\n  val : [%lx]\n",
+		 str, prm->addr, prm->val);
 
 	/* get command ID */
 	for (i = 0; i < D_MEM_NUM; i++) {
@@ -114,8 +116,6 @@ static int buff_parser(const char __user *buffer, unsigned long buffer_len,
 	return 0;
 }
 
-
-
 int mem_read(const struct cmd_param *prm)
 {
 	long val = -1;
@@ -131,8 +131,8 @@ int mem_read(const struct cmd_param *prm)
 		val = readl(prm->reg);
 		break;
 	}
-	pr_info("  mem read [%08lX] : %0*lX\n", prm->addr, prm->access_size*2,
-						val);
+	pr_info("  mem read [%08lX] : %0*lX\n",
+		prm->addr, prm->access_size*2, val);
 
 	return 0;
 }
@@ -150,12 +150,11 @@ int mem_write(const struct cmd_param *prm)
 		writel(prm->val, prm->reg);
 		break;
 	}
-	pr_debug("  mem write [%08lX] : %0*lX\n", prm->addr, prm->access_size*2,
-						  prm->val);
+	pr_debug("  mem write [%08lX] : %0*lX\n",
+		 prm->addr, prm->access_size*2, prm->val);
 
 	return 0;
 }
-
 
 int mem_dump(const struct cmd_param *prm)
 {
@@ -176,8 +175,9 @@ int mem_dump(const struct cmd_param *prm)
 		ret = mem_read(&tmp);
 		if (ret)
 			return ret;
+
 		tmp.addr += tmp.access_size;
-		tmp.reg += tmp.access_size;
+		tmp.reg  += tmp.access_size;
 	}
 
 	return 0;
@@ -223,7 +223,7 @@ ssize_t memd_proc_write(struct file *file, const char __user *buffer,
 
 static const struct file_operations entry_proc_fops = {
 	.owner = THIS_MODULE,
-	.write  = memd_proc_write,
+	.write = memd_proc_write,
 };
 
 static int memd_init(void)
