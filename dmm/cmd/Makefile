@@ -7,13 +7,13 @@ AUTOFILES = cmdlist.c cmdlist.h
 
 include $(TOP)/include/config.mk
 
-cmdlist.c: cmdlist.h
+cmdlist.c: cmdlist.h $(TOP)/include/cmd.h
 	@rm -f $@
 	@echo "#include \"cmdlist.h\""                                        >> $@
-	@echo "static STCMDLIST s_tblCmdList[] = {"                           >> $@
+	@echo "static STCMD *s_tblCmdList[] = {"                              >> $@
 	@grep -h INSTALL_CMD $(SRC_ALL) | sed -e "s/INSTALL_CMD/CMD_DEFINE/g" >> $@
 	@echo "};"                                                            >> $@
 	@echo "CMD_LIST_SIZE;"                                                >> $@
 
-cmdlist.h:
+cmdlist.h: $(SRC_ALL) $(TOP)/include/cmd.h
 	@grep -h INSTALL_CMD $(SRC_ALL) | sed -e "s/INSTALL_CMD/CMD_EXTERN/g" > $@

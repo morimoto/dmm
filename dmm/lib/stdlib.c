@@ -1,6 +1,6 @@
 /*=============================================
 
-                     stdlib
+		stdlib
 
 2008/09  morimoto
 ==============================================*/
@@ -8,79 +8,77 @@
 
 //=====================================
 //
-//              GetAddress
+//	GetAddress
 //
 //=====================================
-uintptr_t GetAddress( const char *pstrArgv )
+uintptr_t GetAddress(const char *pstrArgv)
 {
-    unsigned long addr = 0;
+	unsigned long addr = 0;
 
-    sscanf( pstrArgv , "%lx" , &addr );
-    DMSG( "addr = 0x%08lx\n" , addr );
+	sscanf(pstrArgv, "%lx", &addr);
+	DMSG("addr = 0x%08lx\n", addr);
 
-    return addr;
+	return addr;
 }
 
 //=====================================
 //
-//          GetStype
+//	GetStype
 //
 //=====================================
-enum ESTYPE GetStype( const char *pstrArgv )
+enum ESTYPE GetStype(const char *pstrArgv)
 {
-    enum ESTYPE type = TERR;
+	enum ESTYPE type = TERR;
 
-    DMSG( "type = " );
+	DMSG("type = ");
 
-    switch ( pstrArgv[0] ) {
-    case 'b' : type = TBYTE; DMSG( "BYTE\n" ); break;
-    case 'w' : type = TWORD; DMSG( "WORD\n" ); break;
-    case 'l' : type = TLONG; DMSG( "LONG\n" ); break;
-    default: DMSG( "type error\n" );
-    }
+	switch (pstrArgv[0]) {
+	case 'b': type = TBYTE; DMSG("BYTE\n"); break;
+	case 'w': type = TWORD; DMSG("WORD\n"); break;
+	case 'l': type = TLONG; DMSG("LONG\n"); break;
+	default: DMSG("type error\n");
+	}
 
-    if ( 1 != strlen( pstrArgv ) )
-        type = TERR;
+	if (strlen(pstrArgv) != 1)
+		type = TERR;
 
-    return type;
+	return type;
 }
 
 //=====================================
 //
-//          GetData
+//	GetData
 //
 //=====================================
-u32 GetData( const char *pstrArgv )
+u32 GetData(const char *pstrArgv)
 {
-    u32  ret = 0;
-    const char    *fmt = "%d";
+	u32 ret = 0;
+	const char *fmt = "%d";
 
-    //----------------------
-    // check if argv 0xAA style
-    //----------------------
-    if ((2 < strlen( pstrArgv )) &&
-        ( '0' == pstrArgv[0]   ) &&
-        ( 'x' == pstrArgv[1]   )) {
-        fmt = "%x";
-    }
+	//----------------------
+	// check if argv 0xAA style
+	//----------------------
+	if ((strlen(pstrArgv) > 2) &&
+	    ('0' == pstrArgv[0]) &&
+	    ('x' == pstrArgv[1]))
+		fmt = "%x";
 
-    sscanf( pstrArgv , fmt , &ret );
-    DMSG( "length (10)%d , (16)0x%x\n" , ret , ret );
+	sscanf(pstrArgv, fmt, &ret);
+	DMSG("length (10)%d , (16)0x%x\n", ret, ret);
 
-    return ret;
+	return ret;
 }
 
 //=====================================
 //
-//                Error
+//	Error
 //
 //=====================================
-bool _Error( const char *pstrError , const char *pstrFunction , int nLine )
+bool _Error(const char *pstrError, const char *pstrFunction, int nLine)
 {
-    printf( "[error %15s :: %-5d] : %s\n" ,
-            pstrFunction,
-            nLine,
-            pstrError
-            );
-    return false;
+	printf("[error %15s :: %-5d] : %s\n",
+		pstrFunction,
+		nLine,
+		pstrError);
+	return false;
 }

@@ -1,7 +1,7 @@
 /************************************************************************
 
 
-                      memctrl
+			memctrl
 
 2009/04  morimoto
 ************************************************************************/
@@ -12,49 +12,48 @@
 
 //=====================================
 //
-//          ESTYPE
+//	ESTYPE
 //
 //=====================================
 enum ESTYPE {
-    TBYTE,
-    TWORD,
-    TLONG,
-    TERR,
+	TBYTE,
+	TWORD,
+	TLONG,
+	TERR,
 };
 
 //=====================================
 //
-//          STADDRMAP
+//	STADDRMAP
 //
 //=====================================
 typedef struct _addrmap {
-    u32   nSize;
-  uintptr_t   rMap;
-  uintptr_t   rTgt;
+	u32		nSize;
+	uintptr_t	rMap;
+	uintptr_t	rTgt;
 } STADDRMAP;
 
 //=====================================
 //
-//          STMEMCTRL
+//	STMEMCTRL
 //
 //=====================================
 typedef struct _memctrl {
-  bool   (*fnEdit)( uintptr_t, void* );
-  bool   (*fnRead)( uintptr_t, u32* );
-  bool   (*fnDump)( uintptr_t );
-    u32   nIncSize;
-    enum ESTYPE   EStype;
+	bool (*fnEdit)(uintptr_t, void *);
+	bool (*fnRead)(uintptr_t, u32 *);
+	bool (*fnDump)(uintptr_t);
+	u32  nIncSize;
+	enum ESTYPE EStype;
 } STMEMCTRL;
 
-STMEMCTRL* GetMemCtrl( enum ESTYPE );
+STMEMCTRL *GetMemCtrl(enum ESTYPE);
 
-bool       MemInit( void );
-void       MemExit( void );
+bool MemInit(void);
+void MemExit(void);
 
 //----------------------
 // system function
 //----------------------
-bool _sysMemCtrlInit( void );
-
+bool _sysMemCtrlInit(void);
 
 #endif

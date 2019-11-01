@@ -1,82 +1,76 @@
 /************************************************************************
 
- dmm
+	dmm
+
 	2008/09/03  Kuninori Morimoto   renovation start
 	2005/01/26  Sano hideyuki       develop start
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License version 2 as
- published by the Free Software Foundation.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
 
 ************************************************************************/
 //=====================================
 //
-//             include
+//	include
 //
 //=====================================
 #include "dmm.h"
 
 //=====================================
 //
-//               define
+//	define
 //
 //=====================================
 
 //======================================================================
 //
 //
-//                                function
+//			function
 //
 //
 //======================================================================
 //=====================================
 //
-//               main
+//	main
 //
 //=====================================
-int main( int   nArgc,
-	  char *pstrArgv[] )
+int main(int nArgc, char *pstrArgv[])
 {
-    int i;
-    const STCMD* cmd;
+	int i;
+	const STCMD *cmd;
 
-    //=====================================
-    //
-    //             check param
-    //
-    //=====================================
-    _sysCmdInit(  );
+	//=====================================
+	//
+	//	check param
+	//
+	//=====================================
+	if (nArgc < 2)
+		return Usage("parameter is nedded");
 
-    if( 2 > nArgc )
-        return Usage( "parameter is nedded" );
+	// shift arg
+	nArgc--;
+	pstrArgv++;
 
-    // shift arg
-    nArgc--;
-    pstrArgv++;
+	for (i = 0; i < GetCmdListSize(); i++) {
 
-    for ( i=0 ; i<GetCmdListSize( ) ; i++ ) {
+		cmd = GetCmdList(i);
 
-        if ( !IsEnableCmd( i ) )
-            continue;
+		if (CMD_HIT(pstrArgv[0], cmd->pstrName) &&
+		    pstrArgv[1] &&
+		    (CMD_HIT(pstrArgv[1], "--help") ||
+		     CMD_HIT(pstrArgv[1], "-h")))
+			return DetailUsage(cmd->pstrName);
 
-        cmd = GetCmdList( i ); 
+		if (cmd->fnIsHit(nArgc, pstrArgv))
+			goto cmdstart;
+	}
 
-        if ( CMD_HIT( pstrArgv[0], cmd->pstrName ) &&
-             pstrArgv[1] &&
-             (CMD_HIT( pstrArgv[1], "--help" ) ||
-              CMD_HIT( pstrArgv[1], "-h" )))
-            return DetailUsage( cmd->pstrName );
+	return Usage("parameter error");
 
-        if ( cmd->fnIsHit( nArgc , pstrArgv ) )
-            goto cmdstart;
-    }
+cmdstart:
+	if (!cmd->fnCmd(nArgc, pstrArgv))
+		Error("Cmd return error");
 
-    return
-        Usage( "parameter error" );
-
- cmdstart:
-    if( !cmd->fnCmd( nArgc , pstrArgv ) )
-        Error( "Cmd return error" );
-
-    return 0;
+	return 0;
 }
