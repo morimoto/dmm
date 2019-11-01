@@ -28,9 +28,6 @@
 //
 //
 //======================================================================
-#define PRODUCE_BY      "Produce by        : Kuninori Morimoto"
-#define SPECIAL_THANKS  "Special thanks to : Hideyuki Sano\n"
-
 #ifdef _DEBUG
 #define DMSG(args...)  printf(args)
 #else

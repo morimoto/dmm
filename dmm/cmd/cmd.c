@@ -78,8 +78,6 @@ bool Usage(const char *pMsg)
 		}
 	}
 
-	printf("\n" PRODUCE_BY "\n" SPECIAL_THANKS "\n");
-
 	return true;
 }
 
