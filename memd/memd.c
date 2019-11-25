@@ -13,6 +13,7 @@
 #include <linux/ctype.h>
 #include <linux/uaccess.h>
 #include <linux/io.h>
+#include <linux/mutex.h>
 #include "../version.h"
 
 #define PROCNAME "reg"
@@ -41,6 +42,10 @@ struct cmd_param {
 	unsigned long val;
 	int access_size;
 	unsigned long mapping_size;
+};
+
+struct memd_private_data {
+	struct mutex mutex; /* for read/write/dump */
 };
 
 static int buff_parser(const char __user *buffer, unsigned long buffer_len,
@@ -189,6 +194,7 @@ ssize_t memd_proc_write(struct file *file, const char __user *buffer,
 {
 	int ret;
 	struct cmd_param prm;
+	struct memd_private_data *pdata = file->private_data;
 
 	ret = buff_parser(buffer, len, &prm);
 	if (ret)
@@ -199,6 +205,9 @@ ssize_t memd_proc_write(struct file *file, const char __user *buffer,
 		pr_err("  ioremap fail [%08lX]\n", prm.addr);
 		return -ENOMEM;
 	}
+
+	/* start critical section */
+	mutex_lock(&pdata->mutex);
 
 	switch (prm.cmd) {
 	case D_MEM_READ:
@@ -215,20 +224,35 @@ ssize_t memd_proc_write(struct file *file, const char __user *buffer,
 		ret = -EINVAL;
 	}
 
+	mutex_unlock(&pdata->mutex);
+	/* end critical section */
+
 	iounmap(prm.reg);
 
 	return ret ? : len;
 }
 
+static int memd_proc_open(struct inode *inode, struct file *file)
+{
+	struct memd_private_data *pdata = PDE_DATA(inode);
+
+	file->private_data = pdata;
+
+	return 0;
+}
 
 static const struct file_operations entry_proc_fops = {
 	.owner = THIS_MODULE,
 	.write = memd_proc_write,
+	.open  = memd_proc_open,
 };
 
 static int memd_init(void)
 {
-	proc_create_data(PROCNAME, 0600, NULL, &entry_proc_fops, NULL);
+	static struct memd_private_data pdata;
+
+	mutex_init(&pdata.mutex);
+	proc_create_data(PROCNAME, 0600, NULL, &entry_proc_fops, &pdata);
 	pr_info("memd driver loaded (%s)\n", version);
 
 	return 0;
