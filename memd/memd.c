@@ -122,27 +122,6 @@ static int buff_parser(const char __user *buffer, unsigned long buffer_len,
 	return 0;
 }
 
-int mem_read(const struct cmd_param *prm)
-{
-	long val = -1;
-
-	switch (prm->access_size) {
-	case 1:
-		val = readb(prm->reg);
-		break;
-	case 2:
-		val = readw(prm->reg);
-		break;
-	case 4:
-		val = readl(prm->reg);
-		break;
-	}
-	pr_info("  mem read [%08lX] : %0*lX\n",
-		prm->addr, prm->access_size*2, val);
-
-	return 0;
-}
-
 int mem_write(const struct cmd_param *prm)
 {
 	switch (prm->access_size) {
@@ -166,7 +145,7 @@ int mem_dump(const struct cmd_param *prm)
 {
 	struct cmd_param tmp;
 	int i;
-	int ret;
+	long val = -1;
 
 	/*
 	 * mem_dump() needs to update addr/reg,
@@ -178,9 +157,19 @@ int mem_dump(const struct cmd_param *prm)
 	 */
 	tmp = *prm;
 	for (i = 0; i < tmp.mapping_size; i += tmp.access_size) {
-		ret = mem_read(&tmp);
-		if (ret)
-			return ret;
+		switch (tmp.access_size) {
+		case 1:
+			val = readb(tmp.reg);
+			break;
+		case 2:
+			val = readw(tmp.reg);
+			break;
+		case 4:
+			val = readl(tmp.reg);
+			break;
+		}
+		pr_info("  mem read [%08lX] : %0*lX\n",
+			tmp.addr, tmp.access_size*2, val);
 
 		tmp.addr += tmp.access_size;
 		tmp.reg  += tmp.access_size;
@@ -211,13 +200,11 @@ ssize_t memd_proc_write(struct file *file, const char __user *buffer,
 
 	switch (prm.cmd) {
 	case D_MEM_READ:
-		ret = mem_read(&prm);
+	case D_MEM_DUMP:
+		ret = mem_dump(&prm);
 		break;
 	case D_MEM_WRITE:
 		ret = mem_write(&prm);
-		break;
-	case D_MEM_DUMP:
-		ret = mem_dump(&prm);
 		break;
 	default:
 		pr_err("  Fatal error\n");
