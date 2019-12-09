@@ -119,6 +119,10 @@ static int buff_parser(const char __user *buffer, unsigned long buffer_len,
 		break;
 	}
 
+	/* check alignment */
+	if (prm->addr % prm->access_size)
+		return -EINVAL;
+
 	return 0;
 }
 
