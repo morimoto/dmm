@@ -42,10 +42,13 @@ struct cmd_param {
 	unsigned long val;
 	int access_size;
 	unsigned long mapping_size;
+	struct memd_private_data *pdata;
 };
 
 struct memd_private_data {
 	struct mutex mutex; /* for read/write/dump */
+	long read_val;
+	int read_val_len;
 };
 
 static int buff_parser(const char __user *buffer, unsigned long buffer_len,
@@ -144,6 +147,9 @@ int mem_read(const struct cmd_param *prm)
 	pr_info("  mem read [%08lX] : %0*lX\n",
 		prm->addr, prm->access_size*2, val);
 
+	prm->pdata->read_val = val;
+	prm->pdata->read_val_len = prm->access_size * 2;
+
 	return 0;
 }
 
@@ -210,6 +216,7 @@ ssize_t memd_proc_write(struct file *file, const char __user *buffer,
 	struct cmd_param prm;
 	struct memd_private_data *pdata = file->private_data;
 
+	prm.pdata = pdata;
 	ret = buff_parser(buffer, len, &prm);
 	if (ret)
 		return ret;
@@ -246,6 +253,34 @@ ssize_t memd_proc_write(struct file *file, const char __user *buffer,
 	return ret ? : len;
 }
 
+static ssize_t memd_proc_read(struct file *file, char __user *buff, size_t len,
+			      loff_t *pos)
+{
+	int ret = 0;
+	struct memd_private_data *pdata = file->private_data;
+	char msg_buff[2 * sizeof(long) + 1];
+
+	/* start critical section */
+	mutex_lock(&pdata->mutex);
+
+	if (!pdata->read_val_len)
+		goto UNLOCK;
+
+	sprintf(msg_buff, "%0*lx", pdata->read_val_len, pdata->read_val);
+	if (copy_to_user(buff, msg_buff, pdata->read_val_len)) {
+		ret = -EFAULT;
+		goto UNLOCK;
+	}
+	ret = pdata->read_val_len;
+	pdata->read_val_len = 0;
+
+UNLOCK:
+	mutex_unlock(&pdata->mutex);
+	/* end critical section */
+
+	return ret;
+}
+
 static int memd_proc_open(struct inode *inode, struct file *file)
 {
 	struct memd_private_data *pdata = PDE_DATA(inode);
@@ -258,6 +293,7 @@ static int memd_proc_open(struct inode *inode, struct file *file)
 static const struct file_operations entry_proc_fops = {
 	.owner = THIS_MODULE,
 	.write = memd_proc_write,
+	.read  = memd_proc_read,
 	.open  = memd_proc_open,
 };
 
@@ -266,6 +302,7 @@ static int memd_init(void)
 	static struct memd_private_data pdata;
 
 	mutex_init(&pdata.mutex);
+	pdata.read_val_len = 0;
 	proc_create_data(PROCNAME, 0600, NULL, &entry_proc_fops, &pdata);
 	pr_info("memd driver loaded (%s)\n", version);
 
