@@ -51,6 +51,9 @@ struct memd_private_data {
 	int read_val_len;
 };
 
+static bool using_script;
+module_param(using_script, bool, 0444);
+
 static int buff_parser(const char __user *buffer, unsigned long buffer_len,
 		       struct cmd_param *prm)
 {
@@ -144,8 +147,9 @@ int mem_read(const struct cmd_param *prm)
 		val = readl(prm->reg);
 		break;
 	}
-	pr_info("  mem read [%08lX] : %0*lX\n",
-		prm->addr, prm->access_size*2, val);
+	if (!using_script)
+		pr_info("  mem read [%08lX] : %0*lX\n",
+			prm->addr, prm->access_size*2, val);
 
 	prm->pdata->read_val = val;
 	prm->pdata->read_val_len = prm->access_size * 2;
@@ -305,6 +309,9 @@ static int memd_init(void)
 	pdata.read_val_len = 0;
 	proc_create_data(PROCNAME, 0600, NULL, &entry_proc_fops, &pdata);
 	pr_info("memd driver loaded (%s)\n", version);
+
+	if (using_script)
+		pr_info("using_script option is enabled\n");
 
 	return 0;
 }
