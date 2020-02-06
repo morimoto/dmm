@@ -126,6 +126,27 @@ static int buff_parser(const char __user *buffer, unsigned long buffer_len,
 	return 0;
 }
 
+int mem_read(const struct cmd_param *prm)
+{
+	long val = -1;
+
+	switch (prm->access_size) {
+	case 1:
+		val = readb(prm->reg);
+		break;
+	case 2:
+		val = readw(prm->reg);
+		break;
+	case 4:
+		val = readl(prm->reg);
+		break;
+	}
+	pr_info("  mem read [%08lX] : %0*lX\n",
+		prm->addr, prm->access_size*2, val);
+
+	return 0;
+}
+
 int mem_write(const struct cmd_param *prm)
 {
 	switch (prm->access_size) {
@@ -204,6 +225,8 @@ ssize_t memd_proc_write(struct file *file, const char __user *buffer,
 
 	switch (prm.cmd) {
 	case D_MEM_READ:
+		ret = mem_read(&prm);
+		break;
 	case D_MEM_DUMP:
 		ret = mem_dump(&prm);
 		break;
