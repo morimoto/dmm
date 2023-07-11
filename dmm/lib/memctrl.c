@@ -107,7 +107,7 @@ static STADDRMAP *getaddrmap(uintptr_t rAddr, STMEMCTRL *pCtrl)
 	// create new one
 	//----------------------
 	page_size	= (u32)sysconf(_SC_PAGE_SIZE);
-	tgt_addr	= rAddr & ~(page_size - 1);
+	tgt_addr	= rAddr & ~(uintptr_t)(page_size - 1);
 	pmap		= s_tblAddrMap + s_nLastAddrMap;
 
 	DMSG("create new mmap\n");
