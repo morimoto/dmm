@@ -42,9 +42,11 @@
 
 		od -tx4 -Ax 0x88000000.bin
 
-	例）me (memory edit) の使い方を見る
+	例）ヘルプを見る
 
+		dmm help
 		dmm help me
+		dmm help d2f
 
 ====================
 * コンパイル方法
