@@ -293,8 +293,11 @@ UNLOCK:
 
 static int memd_proc_open(struct inode *inode, struct file *file)
 {
+#if (LINUX_VERSION_CODE < 0x51100) // v5.17
 	struct memd_private_data *pdata = PDE_DATA(inode);
-
+#else
+	struct memd_private_data *pdata = pde_data(inode);
+#endif
 	file->private_data = pdata;
 
 	return 0;
