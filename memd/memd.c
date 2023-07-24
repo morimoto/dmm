@@ -66,6 +66,7 @@ static int buff_parser(const char __user *buffer, unsigned long buffer_len,
 	if (buffer_len >= RECV_BUFF_SIZE)
 		return -EINVAL;
 
+	memset(buff, 0, sizeof(buff));
 	if (copy_from_user(buff, buffer, buffer_len))
 		return -EFAULT;
 
