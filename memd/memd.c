@@ -134,7 +134,7 @@ static int buff_parser(const char __user *buffer, unsigned long buffer_len,
 	return 0;
 }
 
-int mem_read(const struct cmd_param *prm)
+static int mem_read(const struct cmd_param *prm)
 {
 	long val = -1;
 
@@ -159,7 +159,7 @@ int mem_read(const struct cmd_param *prm)
 	return 0;
 }
 
-int mem_write(const struct cmd_param *prm)
+static int mem_write(const struct cmd_param *prm)
 {
 	switch (prm->access_size) {
 	case 1:
@@ -178,7 +178,7 @@ int mem_write(const struct cmd_param *prm)
 	return 0;
 }
 
-int mem_dump(const struct cmd_param *prm)
+static int mem_dump(const struct cmd_param *prm)
 {
 	struct cmd_param tmp;
 	int i;
@@ -215,8 +215,8 @@ int mem_dump(const struct cmd_param *prm)
 	return 0;
 }
 
-ssize_t memd_proc_write(struct file *file, const char __user *buffer,
-			size_t len, loff_t *pos)
+static ssize_t memd_proc_write(struct file *file, const char __user *buffer,
+			       size_t len, loff_t *pos)
 {
 	int ret;
 	struct cmd_param prm;
