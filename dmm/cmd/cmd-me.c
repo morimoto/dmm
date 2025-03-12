@@ -15,7 +15,7 @@
 static STHELPMSG s_Help[] = {
 	{
 		"me", "memory edit",
-		"dmm me[.d, .w, .l] addr data\n"
+		"dmm me[.b, .w, .l] addr data\n"
 		"    addr  : address\n"
 		"    data  : data\n"
 		"ex) dmm me.w 0x89000000 0x1234\n"
