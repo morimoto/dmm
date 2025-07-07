@@ -342,3 +342,4 @@ module_init(memd_init);
 module_exit(memd_exit);
 
 MODULE_LICENSE("GPL v2");
+MODULE_DESCRIPTION("Memory handling module for development");
